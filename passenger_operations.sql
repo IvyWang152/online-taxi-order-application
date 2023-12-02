@@ -3,16 +3,15 @@ USE city_ride;
 -- 1. CREATE: create passenger
 DELIMITER $$
 
-CREATE PROCEDURE create_driver(
-	account_number VARCHAR(50),
+CREATE PROCEDURE create_passenger(
+	account_number VARCHAR(20),
     name VARCHAR(50),
-    gender VARCHAR(50),
-    birth_date DATE,
-    address VARCHAR(255)
+    gender VARCHAR(10),
+    birth_date DATE
 )
 BEGIN
-INSERT INTO passenger(account_number, name, gender, birth_date, address) 
-VALUES (account_number, name,gender,birth_date, address);
+INSERT INTO passenger(account_number, name, gender, birth_date) 
+VALUES (account_number, name,gender,birth_date);
 END $$
 
 DELIMITER ;
@@ -111,4 +110,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+
+
 

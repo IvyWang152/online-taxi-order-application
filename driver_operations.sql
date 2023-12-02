@@ -18,7 +18,16 @@ END $$
 DELIMITER ;
 
 CALL create_driver('AB6X','admin','unknown','2000-01-01','Malden');
+CALL create_driver('TT0TT','Harry','male','1986-10-13','Hagwarts');
+CALL create_driver('MMB122','Micy','female','2200-11-07','Texas');
+passenger
+DELIMITER $$
+CREATE PROCEDURE get_drivers()
+BEGIN
+	SELECT * from driver;
+END $$
 
+DELIMITER ;
 -- 2. CREATE: create a car
 DELIMITER $$
 CREATE PROCEDURE create_car(
@@ -125,7 +134,7 @@ BEGIN
     birth_date = birth_date_p,
     address = address_p,
     is_available = is_available_p
-    WHERE drier_license = driver_license_p;
+    WHERE driver_license = driver_license_p;
 END $$
 DELIMITER ;
 
