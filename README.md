@@ -8,29 +8,9 @@ The passenger can manage passenger profile and order details.
 
 # features
 
-# structure
-taxi-order/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── org/
-│   │   │   │   └── example/
-│   │   │   │       ├── cli/
-│   │   │   │       │   └── CLI.java            # Command Line Interface for user interaction
-│   │   │   │       │
-│   │   │   │       ├── dao/                    # Data Access Objects for database interactions
-│   │   │   │       │   ├── DriverDao.java
-│   │   │   │       │   └── PassengerDao.java
-│   │   │   │       │
-│   │   │   │       ├── DBConnector.java        # Database connection management
-│   │   │   │       │
-│   │   │   │       ├── model/                  # Entity classes representing data
-│   │   │   │       │   ├── Driver.java
-│   │   │   │       │   └── Passenger.java
-│   │   │   │       │
-│   │   │   │       └── Main.java               # Main entry point of the application
-│   │   │   │
-├── pom.xml                                     # Maven build file (if using Maven)
-└── README.md                                   # Project description and instructions
-
+# structure (taxi_order/src/main/java/org/example)
+--cli/CLI.java # Command Line Interface for user interaction
+--dao/         # Data Access Objects for database interactions
+--DBConnector.java        # Database connection management
+--model/                  # Entity classes representing data
+--Main.java               # Main entry point of the application
