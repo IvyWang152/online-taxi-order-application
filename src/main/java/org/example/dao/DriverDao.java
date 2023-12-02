@@ -4,6 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import org.example.DBConnector;
 import org.example.model.Driver;
@@ -35,12 +36,27 @@ public class DriverDao {
   }
 
   public Driver getDriver(String driverLicense) {
-    // SQL query or stored procedure call to get a driver by ID
-
+    // SQL query or stored procedure call to get a driver by driverLicense
+    return null;
   }
 
   public List<Driver> getAllDrivers() {
     // SQL query or stored procedure call to get all drivers
+    String procedureCall = "{CALL get_drivers}";
+    List<Driver> res = new ArrayList<>();
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)){
+         try (ResultSet rs = stmt.executeQuery()){
+            while(rs.next()){
+              res.add(mapRowToDriver(rs));
+            }
+            return res;
+         }
+    } catch (SQLException e){
+      e.printStackTrace();
+
+    }
+    return null;
 
   }
 
