@@ -54,4 +54,14 @@ public class Passenger {
   public void setBirthDate(Date birthDate) {
     this.birthDate = birthDate;
   }
+
+  @Override
+  public String toString() {
+    return "Passenger{" +
+        "accountNumber='" + accountNumber + '\'' +
+        ", name='" + name + '\'' +
+        ", gender='" + gender + '\'' +
+        ", birthDate=" + birthDate +
+        '}';
+  }
 }

@@ -30,7 +30,7 @@ public class PassengerDao {
   }
   public void addPassenger(Passenger passenger) {
     // SQL query or stored procedure call to add a driver
-    String procedureCall = "{CALL create_driver(?, ?, ?, ?, ?)}";
+    String procedureCall = "{CALL create_passenger(?, ?, ?, ?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
 
