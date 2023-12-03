@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import org.example.dao.DriverDao;
@@ -34,16 +36,47 @@ public class CLI {
     }
   }
 
+  boolean isAuthenticatedDriver = false;
+  Driver currentDriver = null;
+
   public void showDriverMenu() {
-    while(true) {
+    boolean ifContinued = true;
+    while(ifContinued) {
       System.out.println("***** Welcome to Driver Dashboard! *****");
-      System.out.println("1. Add new driver");
-      System.out.println("2. View drivers");
+      if(!isAuthenticatedDriver) {
+        System.out.println("1. Register as a new driver");
+        System.out.println("2. Log in as a driver");
+        System.out.println("11. Close driver dashboard");
+      } else{
+        System.out.println("3. View driver profile");
+        System.out.println("4. Update driver profile");
+        System.out.println("5. Delete driver account");
+        System.out.println("6. View all drivers");
+        System.out.println("10. log out");
+      }
+
+//      System.out.println("1. Add new driver");
+//      System.out.println("2. View drivers");
+//      System.out.println("3. View driver profile");
       // add more operations later
-      System.out.print("Enter command number: ");
-      int choice = scanner.nextInt();
-      scanner.nextLine(); // Consume the newline character
-      handleDriverOperation(choice);
+//      System.out.print("Enter command number: ");
+//      int choice = scanner.nextInt();
+//      scanner.nextLine(); // Consume the newline character
+//      handleDriverOperation(choice);
+
+      try {
+
+        System.out.print("Enter command number: ");
+        int choice = scanner.nextInt();
+        if(choice==11){
+          ifContinued = false;
+        }
+        scanner.nextLine(); // Consume the newline character
+        handleDriverOperation(choice);
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid input! Please enter a number.");
+        scanner.nextLine(); // Consume the invalid input
+      }
     }
   }
 
@@ -60,8 +93,25 @@ public class CLI {
     switch(choice){
       case 1:
         addNewDriver();
+        break;
       case 2:
+        loginDriver();
+        break;
+      case 3:
+        showDriverProfile();
+        break;
+      case 4:
+        updateDriverProfile();
+        break;
+      case 5:
+        deleteDriverAccount();
+        break;
+      case 6:
         showAllDrivers();
+        break;
+      case 10:
+        logoutDriver();
+        break;
       default:
         break;
     }
@@ -93,6 +143,105 @@ public class CLI {
       System.out.println("Error creating driver: " + e.getMessage());
     }
   }
+
+  public void loginDriver() {
+    System.out.println("Enter driver license: ");
+    String driverLicense = scanner.nextLine().trim();
+    currentDriver = driverDao.getDriver(driverLicense);
+    if(currentDriver==null){
+      System.out.println("This account doesn't exist. Please register first or type right driver license");
+      return;
+    }
+    isAuthenticatedDriver = true;
+
+
+  }
+
+  public void logoutDriver() {
+
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register first or log in first");
+      return;
+    }
+    isAuthenticatedDriver = false;
+    currentDriver = null;
+    System.out.println("You've successfully logged out!");
+
+  }
+
+  public void showDriverProfile() {
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    System.out.println(currentDriver.toString());
+  }
+
+  public void updateDriverProfile(){
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    String driverLicense = currentDriver.getDriverLicense();
+    String name = currentDriver.getName();
+    String gender = currentDriver.getGender();
+    Date birthDate = currentDriver.getBirthDate();
+    String address = currentDriver.getAddress();
+    boolean isAvailable = currentDriver.getAvailable();
+
+    System.out.println("Edit name: (Press Enter to skip)");
+    String tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      name = tmp;
+    }
+
+    System.out.println("Edit gender (female/male): (Press Enter to skip) ");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      gender = tmp;
+    }
+
+    System.out.println("Edit birth date (yy-mm-dd): (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      try {
+        birthDate = java.sql.Date.valueOf(tmp);
+      } catch (IllegalArgumentException e) {
+        System.out.println("Invalid date format. Please use yy-mm-dd format.");
+        return; // Exit the method if invalid date is entered
+      }
+    }
+
+    System.out.println("Edit address: (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      address = tmp;
+    }
+
+    System.out.println("Edit availability (true or false): (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      isAvailable = Boolean.parseBoolean(tmp);
+    }
+
+    currentDriver = driverDao.updateDriver(new Driver(driverLicense,name,gender,birthDate,address,isAvailable));
+    System.out.println("Update driver profile successfully!");
+    System.out.println(currentDriver.toString());
+  }
+
+  public void deleteDriverAccount(){
+    if(!isAuthenticatedDriver || currentDriver == null){
+      System.out.println("Only a registered member can delete their account when they log in");
+      return;
+    }
+    driverDao.deleteDriver(currentDriver.getDriverLicense());
+    isAuthenticatedDriver = false;
+    currentDriver=null;
+    System.out.println("Driver account successfully deleted!");
+
+  }
+
+
 
   public void showAllDrivers(){
     List<Driver> drivers = driverDao.getAllDrivers();
