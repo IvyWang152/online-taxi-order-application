@@ -103,11 +103,6 @@ public class CLI {
     }
   }
 
-
-  public void showPassengerMenu() {
-    boolean exit = false;
-
-<<<<<<< HEAD
   public void handleDriverOperation(int choice) {
     switch(choice){
       case 1:
@@ -133,7 +128,11 @@ public class CLI {
         break;
       default:
         break;
-=======
+    }
+  }
+
+  public void showPassengerMenu() {
+    boolean exit = false;
     while (!exit) {
       System.out.println("***** Welcome to Passenger Dashboard! *****");
       System.out.println("1. Add a new passenger");
@@ -155,7 +154,6 @@ public class CLI {
         System.out.println("Invalid input. Please enter a valid value.");
         scanner.nextLine(); // Consume the invalid input
       }
->>>>>>> 44e1ce8da80d78b8e271f2f3dee04e41873dbc01
     }
   }
 
@@ -204,7 +202,6 @@ public class CLI {
     }
   }
 
-<<<<<<< HEAD
   public void loginDriver() {
     System.out.println("Enter driver license: ");
     String driverLicense = scanner.nextLine().trim();
@@ -305,7 +302,6 @@ first or type right driver license");
 
 
 
-=======
   //command line prompts for creating a passenger
   public void addNewPassenger(){
     System.out.println("Enter the account_number: ");
@@ -330,7 +326,6 @@ first or type right driver license");
     }
   }
 
->>>>>>> 44e1ce8da80d78b8e271f2f3dee04e41873dbc01
   public void showAllDrivers(){
     List<Driver> drivers = driverDao.getAllDrivers();
     if(drivers.isEmpty()){
