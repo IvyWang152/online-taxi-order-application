@@ -90,7 +90,7 @@ CREATE TABLE ride_order (
     car_plate VARCHAR(20),
     pickup_location INT,
     destination_location INT,
-    FOREIGN KEY (account_number) REFERENCES passenger(account_number) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (account_number) REFERENCES passenger(account_number) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fare_policy_name) REFERENCES fare_policy(name) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (car_plate) REFERENCES car(plate) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (pickup_location) REFERENCES location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT,

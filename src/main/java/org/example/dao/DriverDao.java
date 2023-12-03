@@ -90,19 +90,18 @@ public class DriverDao {
     String procedureCall = "{CALL get_drivers}";
     List<Driver> res = new ArrayList<>();
     try (Connection conn = DBConnector.getConnection();
-         CallableStatement stmt = conn.prepareCall(procedureCall)){
-         try (ResultSet rs = stmt.executeQuery()){
-            while(rs.next()){
-              res.add(mapRowToDriver(rs));
-            }
-            return res;
-         }
-    } catch (SQLException e){
-      e.printStackTrace();
+         CallableStatement stmt = conn.prepareCall(procedureCall);
+         ResultSet rs = stmt.executeQuery()) {
 
+      while (rs.next()) {
+        res.add(mapRowToDriver(rs));
+      }
+      return res;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
     }
     return null;
-
   }
 
 

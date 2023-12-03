@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import org.example.DBConnector;
+import org.example.model.Driver;
 import org.example.model.Passenger;
 
 public class PassengerDao {
@@ -25,6 +27,23 @@ public class PassengerDao {
       }
     }
     return passengers;
+  }
+  public void addPassenger(Passenger passenger) {
+    // SQL query or stored procedure call to add a driver
+    String procedureCall = "{CALL create_driver(?, ?, ?, ?, ?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+
+      stmt.setString(1, passenger.getAccountNumber());
+      stmt.setString(2, passenger.getName());
+      stmt.setString(3, passenger.getGender());
+      stmt.setDate(4, new java.sql.Date(passenger.getBirthDate().getTime()));
+
+      stmt.execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+    }
   }
 
   public void createPassenger(Passenger passenger) throws SQLException {
