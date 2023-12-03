@@ -46,6 +46,7 @@ public class Driver {
     return this.isAvailable;
   }
 
+
   public void setDriverLicense(String driverLicense) {
     this.driverLicense = driverLicense;
   }
@@ -94,6 +95,7 @@ public class Driver {
         ", gender='" + gender + '\'' +
         ", birth_date=" + birthDate + '\''+
         ", address='" + address + '\'' +
+        ", is available='" + isAvailable + '\'' +
         '}';
   }
 }

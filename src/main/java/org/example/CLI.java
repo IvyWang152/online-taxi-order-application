@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Date;
+import java.util.InputMismatchException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
@@ -55,33 +57,94 @@ public class CLI {
     } while (!validInput);
   }
 
+  boolean isAuthenticatedDriver = false;
+  Driver currentDriver = null;
+
   public void showDriverMenu() {
     boolean exit = false;
-
-    while (!exit) {
+    while(!exit) {
       System.out.println("***** Welcome to Driver Dashboard! *****");
-      System.out.println("1. Add a new driver");
-      System.out.println("2. View drivers");
-      System.out.println("3. Exit");
-      System.out.print("Enter command number: ");
+      if(!isAuthenticatedDriver) {
+        System.out.println("1. register");
+        System.out.println("2. log in");
+        System.out.println("11. exit");
+      } else{
+        System.out.println("3. view profile");
+        System.out.println("4. update profile");
+        System.out.println("5. delete account");
+        System.out.println("6. view all drivers");
+        System.out.println("10. log out");
+      }
 
       try {
-        String choice = scanner.next().toLowerCase().trim();
-        scanner.nextLine(); // Consume the newline character
-
-        switch (choice) {
-          case "1", "add a new driver" -> addNewDriver();
-          case "2", "view drivers" -> showAllDrivers();
-          case "3", "exit" -> exit = closingPrompt();
-          default -> System.out.println("Invalid choice. Please enter a valid value.");
+        System.out.print("Enter command number: ");
+        String choice = scanner.nextLine().toLowerCase();
+        switch(choice) {
+          case "1", "register":
+            addNewDriver();
+            break;
+          case "2", "log in":
+            loginDriver();
+            break;
+          case "3", "view profile":
+            showDriverProfile();
+            break;
+          case "4", "update profile":
+            updateDriverProfile();
+            break;
+          case "5", "delete account":
+            deleteDriverAccount();
+            break;
+          case "6", "view all drivers":
+            showAllDrivers();
+            break;
+          case "10", "log out":
+            logoutDriver();
+            break;
+          case "11","exit":
+            exit = closingPrompt();
+            break;
+          default:
+            System.out.println("Invalid choice. Please enter a valid value.");
+            break;
         }
-      } catch (Exception e) {
-        System.out.println("Invalid input. Please enter a valid value.");
-        scanner.nextLine(); // Consume the invalid input
+//        if(choice=="11" || choice.equalsIgnoreCase("exit")){
+//          exit = closingPrompt();
+//        }
+       // handleDriverOperation(choice);
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid input! Please enter a number.");
+        //scanner.nextLine(); // Consume the invalid input
       }
     }
   }
 
+//  public void handleDriverOperation(String choice) {
+//    switch(choice){
+//      case "1", "register":
+//        addNewDriver();
+//        break;
+//      case "2", "login":
+//        loginDriver();
+//        break;
+//      case "3","view profile":
+//        showDriverProfile();
+//        break;
+//      case "4","update profile":
+//        updateDriverProfile();
+//        break;
+//      case "5","delete account":
+//        deleteDriverAccount();
+//        break;
+//      case "6","view all drivers":
+//        showAllDrivers();
+//        break;
+//      case "10","log out":
+//        logoutDriver();
+//        break;
+//      default:
+//        break;
+//    }}
 
   public void showPassengerMenu() {
     boolean exit = false;
@@ -110,16 +173,6 @@ public class CLI {
     }
   }
 
-
-
-  public void handleDriverOperation(String  choice) throws Exception {
-    switch (choice) {
-      case "1", "Add a new driver" -> addNewDriver();
-      case "2", "View drivers" -> showAllDrivers();
-      case "3", "Exit" -> closingPrompt();
-      default -> System.out.println("Invalid choice. Please enter a valid value.");
-    }
-  }
   public void handlePassengerOperation(String choice) throws Exception {
     switch (choice) {
       case "1", "Add a new passenger" -> addNewPassenger();
@@ -154,6 +207,105 @@ public class CLI {
       System.out.println("Error creating driver: " + e.getMessage());
     }
   }
+
+  public void loginDriver() {
+    System.out.println("Enter driver license: ");
+    String driverLicense = scanner.nextLine().trim();
+    currentDriver = driverDao.getDriver(driverLicense);
+    if(currentDriver==null){
+      System.out.println("This account doesn't exist. Please register first or type right driver license");
+      return;
+    }
+    isAuthenticatedDriver = true;
+
+
+  }
+
+  public void logoutDriver() {
+
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register first or log in first");
+      return;
+    }
+    isAuthenticatedDriver = false;
+    currentDriver = null;
+    System.out.println("You've successfully logged out!");
+
+  }
+
+  public void showDriverProfile() {
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    System.out.println(currentDriver.toString());
+  }
+
+  public void updateDriverProfile(){
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    String driverLicense = currentDriver.getDriverLicense();
+    String name = currentDriver.getName();
+    String gender = currentDriver.getGender();
+    Date birthDate = currentDriver.getBirthDate();
+    String address = currentDriver.getAddress();
+    boolean isAvailable = currentDriver.getAvailable();
+
+    System.out.println("Edit name: (Press Enter to skip)");
+    String tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      name = tmp;
+    }
+
+    System.out.println("Edit gender (female/male): (Press Enter to skip) ");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      gender = tmp;
+    }
+
+    System.out.println("Edit birth date (yy-mm-dd): (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      try {
+        birthDate = java.sql.Date.valueOf(tmp);
+      } catch (IllegalArgumentException e) {
+        System.out.println("Invalid date format. Please use yy-mm-dd format.");
+        return; // Exit the method if invalid date is entered
+      }
+    }
+
+    System.out.println("Edit address: (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      address = tmp;
+    }
+
+    System.out.println("Edit availability (true or false): (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      isAvailable = Boolean.parseBoolean(tmp);
+    }
+
+    currentDriver = driverDao.updateDriver(new Driver(driverLicense,name,gender,birthDate,address,isAvailable));
+    System.out.println("Update driver profile successfully!");
+    System.out.println(currentDriver.toString());
+  }
+
+  public void deleteDriverAccount(){
+    if(!isAuthenticatedDriver || currentDriver == null){
+      System.out.println("Only a registered member can delete their account when they log in");
+      return;
+    }
+    driverDao.deleteDriver(currentDriver.getDriverLicense());
+    isAuthenticatedDriver = false;
+    currentDriver=null;
+    System.out.println("Driver account successfully deleted!");
+
+  }
+
+
 
   //command line prompts for creating a passenger
   public void addNewPassenger(){
