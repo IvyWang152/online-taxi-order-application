@@ -61,72 +61,90 @@ public class CLI {
   Driver currentDriver = null;
 
   public void showDriverMenu() {
-    boolean ifContinued = true;
-    while(ifContinued) {
+    boolean exit = false;
+    while(!exit) {
       System.out.println("***** Welcome to Driver Dashboard! *****");
       if(!isAuthenticatedDriver) {
-        System.out.println("1. Register as a new driver");
-        System.out.println("2. Log in as a driver");
-        System.out.println("11. Close driver dashboard");
+        System.out.println("1. register");
+        System.out.println("2. log in");
+        System.out.println("11. exit");
       } else{
-        System.out.println("3. View driver profile");
-        System.out.println("4. Update driver profile");
-        System.out.println("5. Delete driver account");
-        System.out.println("6. View all drivers");
+        System.out.println("3. view profile");
+        System.out.println("4. update profile");
+        System.out.println("5. delete account");
+        System.out.println("6. view all drivers");
         System.out.println("10. log out");
       }
 
-//      System.out.println("1. Add new driver");
-//      System.out.println("2. View drivers");
-//      System.out.println("3. View driver profile");
-      // add more operations later
-//      System.out.print("Enter command number: ");
-//      int choice = scanner.nextInt();
-//      scanner.nextLine(); // Consume the newline character
-//      handleDriverOperation(choice);
-
       try {
-
         System.out.print("Enter command number: ");
-        int choice = scanner.nextInt();
-        if(choice==11){
-          ifContinued = false;
+        String choice = scanner.nextLine().toLowerCase();
+        switch(choice) {
+          case "1", "register":
+            addNewDriver();
+            break;
+          case "2", "log in":
+            loginDriver();
+            break;
+          case "3", "view profile":
+            showDriverProfile();
+            break;
+          case "4", "update profile":
+            updateDriverProfile();
+            break;
+          case "5", "delete account":
+            deleteDriverAccount();
+            break;
+          case "6", "view all drivers":
+            showAllDrivers();
+            break;
+          case "10", "log out":
+            logoutDriver();
+            break;
+          case "11","exit":
+            exit = closingPrompt();
+            break;
+          default:
+            System.out.println("Invalid choice. Please enter a valid value.");
+            break;
         }
-        scanner.nextLine(); // Consume the newline character
-        handleDriverOperation(choice);
+//        if(choice=="11" || choice.equalsIgnoreCase("exit")){
+//          exit = closingPrompt();
+//        }
+       // handleDriverOperation(choice);
       } catch (InputMismatchException e) {
         System.out.println("Invalid input! Please enter a number.");
-        scanner.nextLine(); // Consume the invalid input
+        //scanner.nextLine(); // Consume the invalid input
       }
     }
   }
 
-  public void handleDriverOperation(int choice) {
-    switch(choice){
-      case 1:
-        addNewDriver();
-        break;
-      case 2:
-        loginDriver();
-        break;
-      case 3:
-        showDriverProfile();
-        break;
-      case 4:
-        updateDriverProfile();
-        break;
-      case 5:
-        deleteDriverAccount();
-        break;
-      case 6:
-        showAllDrivers();
-        break;
-      case 10:
-        logoutDriver();
-        break;
-      default:
-        break;
-    }}
+//  public void handleDriverOperation(String choice) {
+//    switch(choice){
+//      case "1", "register":
+//        addNewDriver();
+//        break;
+//      case "2", "login":
+//        loginDriver();
+//        break;
+//      case "3","view profile":
+//        showDriverProfile();
+//        break;
+//      case "4","update profile":
+//        updateDriverProfile();
+//        break;
+//      case "5","delete account":
+//        deleteDriverAccount();
+//        break;
+//      case "6","view all drivers":
+//        showAllDrivers();
+//        break;
+//      case "10","log out":
+//        logoutDriver();
+//        break;
+//      default:
+//        break;
+//    }}
 
   public void showPassengerMenu() {
     boolean exit = false;
