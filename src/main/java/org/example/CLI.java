@@ -119,33 +119,6 @@ public class CLI {
     }
   }
 
-//  public void handleDriverOperation(String choice) {
-//    switch(choice){
-//      case "1", "register":
-//        addNewDriver();
-//        break;
-//      case "2", "login":
-//        loginDriver();
-//        break;
-//      case "3","view profile":
-//        showDriverProfile();
-//        break;
-//      case "4","update profile":
-//        updateDriverProfile();
-//        break;
-//      case "5","delete account":
-//        deleteDriverAccount();
-//        break;
-//      case "6","view all drivers":
-//        showAllDrivers();
-//        break;
-//      case "10","log out":
-//        logoutDriver();
-//        break;
-//      default:
-//        break;
-//    }}
-
   public void showPassengerMenu() {
     boolean exit = false;
 
