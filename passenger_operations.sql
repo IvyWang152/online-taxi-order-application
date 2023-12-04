@@ -1,6 +1,6 @@
 USE city_ride;
 
--- 1. CREATE: create passenger
+-- CREATE: create passenger
 DELIMITER $$
 
 CREATE PROCEDURE create_passenger(
@@ -15,8 +15,16 @@ VALUES (account_number, name,gender,birth_date);
 END $$
 
 DELIMITER ;
+-- get passenger by account_number
+DELIMITER $$
+CREATE PROCEDURE get_passeger_by_account_number(account_number varchar(20))
+BEGIN
+	SELECT * from passenger
+    where account_number = account_number;
+END $$
+DELIMITER ;
 
--- 2. READ: read all available cars
+-- READ: read all available cars
 DELIMITER //
 
 CREATE PROCEDURE read_available_cars()
@@ -44,7 +52,23 @@ DELIMITER ;
 
 DELIMITER //
 
--- 3. UPDATE: update order(eg: location, car choice)
+-- CREATE: create ride order
+CREATE PROCEDURE create_ride_order(
+    IN passenger_account_number VARCHAR(20),
+    IN pickup_location_id INT,
+    IN car_plate VARCHAR(20),
+    IN distance_traveled DECIMAL(10, 2)
+)
+BEGIN
+    INSERT INTO ride_order(passenger_account_number, pickup_location, car_plate, distance_traveled)
+    VALUES (passenger_account_number, pickup_location_id, car_plate, distance_traveled);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+-- UPDATE: update order(eg: location, car choice)
 CREATE PROCEDURE update_ride_order(
     IN order_id INT,
     IN new_location_id INT,
@@ -62,7 +86,7 @@ END //
 DELIMITER ;
 
 DELIMITER //
--- 4. UPDATE: update user profile
+-- UPDATE: update user profile
 CREATE PROCEDURE update_user_profile(
     IN account_number VARCHAR(20),
     IN new_name VARCHAR(50),
@@ -83,7 +107,7 @@ DELIMITER ;
 
 DELIMITER //
 
--- 5. DELETE: cancel an order
+-- DELETE: cancel an order
 CREATE PROCEDURE Cancel_ride_order(
     IN order_id INT
 )

@@ -13,23 +13,9 @@ import org.example.model.Driver;
 import org.example.model.Passenger;
 
 public class PassengerDao {
-  public List<Passenger> getPassengers() throws SQLException {
-    List<Passenger> passengers = new ArrayList<>();
-    String sql = "SELECT * FROM Passenger"; // Adjusted to retrieve all passenger details
 
-    try (Connection conn = DBConnector.getConnection();
-         Statement stmt = conn.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-
-      while (rs.next()) {
-        Passenger passenger = mapRowToPassenger(rs);
-        passengers.add(passenger);
-      }
-    }
-    return passengers;
-  }
   public void addPassenger(Passenger passenger) {
-    // SQL query or stored procedure call to add a driver
+    // SQL query or stored procedure call to add a passenger
     String procedureCall = "{CALL create_passenger(?, ?, ?, ?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
@@ -45,20 +31,65 @@ public class PassengerDao {
       // Handle or log the error appropriately
     }
   }
+  public Passenger getPassenger(String accountNumber) {
+    // SQL query or stored procedure call to get a passenger by their accountNumber
+    String procedureCall = "{CALL get_passenger_by_account_number(?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+      stmt.setString(1, accountNumber);
+      try (ResultSet rs = stmt.executeQuery()) {
+        if (rs.next()) {
+          return mapRowToPassenger(rs);
+        }
+      }
 
-  public void createPassenger(Passenger passenger) throws SQLException {
-    String sql = "INSERT INTO Passenger (account_number, name, gender, birth_date) VALUES (?, ?, ?, ?)";
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+    }
+    return null;
+  }
+  public Passenger updatePassenger(Passenger passenger){
+    String procedureCall = "{CALL update_driver_details(?, ?, ?, ?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+      stmt.setString(1, passenger.getAccountNumber());
+      stmt.setString(2, passenger.getName());
+      stmt.setString(3, passenger.getGender());
+      stmt.setDate(4, new java.sql.Date(passenger.getBirthDate().getTime()));
+      stmt.execute();
+      return getPassenger(passenger.getAccountNumber());
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+    }
+    return null;
+  }
+
+  public void deletePassenger(String accountNumber){
+    String procedureCall = "{CALL delete_passenger_account(?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)){
+      stmt.setString(1,accountNumber);
+      stmt.execute();
+    } catch (SQLException e){
+      e.printStackTrace();
+    }
+  }
+  public List<Passenger> getAllPassengers() throws SQLException {
+    List<Passenger> passengers = new ArrayList<>();
+    String sql = "SELECT * FROM Passenger"; // Adjusted to retrieve all passenger details
 
     try (Connection conn = DBConnector.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
 
-      pstmt.setString(1, passenger.getAccountNumber());
-      pstmt.setString(2, passenger.getName());
-      pstmt.setString(3, passenger.getGender());
-      pstmt.setDate(4, new java.sql.Date(passenger.getBirthDate().getTime()));
-
-      pstmt.executeUpdate();
+      while (rs.next()) {
+        Passenger passenger = mapRowToPassenger(rs);
+        passengers.add(passenger);
+      }
     }
+    return passengers;
   }
 
   private Passenger mapRowToPassenger(ResultSet rs) throws SQLException {

@@ -136,34 +136,80 @@ public class CLI {
       }
     }
   }
-
+  boolean isAuthenticatedPassenger = false;
+  Passenger currentPassenger = null;
   public void showPassengerMenu() {
     boolean exit = false;
 
     while (!exit) {
       System.out.println("***** Welcome to Passenger Dashboard! *****");
-      System.out.println("1. Add a new passenger");
-      System.out.println("2. View passengers");
-      System.out.println("3. Exit");
-      System.out.print("Enter command number: ");
-
+      if(!isAuthenticatedPassenger) {
+        System.out.println("1. register");
+        System.out.println("2. log in");
+        System.out.println("11. exit");
+      } else{
+        System.out.println("3. view profile");
+        System.out.println("4. update profile");
+        System.out.println("5. delete account");
+        System.out.println("6. view all passengers");
+        System.out.println("7. add car");
+        System.out.println("8. view car");
+        System.out.println("9. view car models");
+        System.out.println("10. log out");
+      }
       try {
-        String choice = scanner.next().toLowerCase().trim();
-        scanner.nextLine(); // Consume the newline character
-
-        switch (choice) {
-          case "1", "add a new passenger" -> addNewPassenger();
-          case "2", "view passengers" -> showAllPassengers();
-          case "3", "exit" -> exit = closingPrompt();
-          default -> System.out.println("Invalid choice. Please enter a valid value.");
+        System.out.print("Enter command number: ");
+        String choice = scanner.nextLine().toLowerCase();
+        switch(choice) {
+          case "1", "register":
+            addNewDriver();
+            break;
+          case "2", "log in":
+            loginDriver();
+            break;
+          case "3", "view profile":
+            showDriverProfile();
+            break;
+          case "4", "update profile":
+            updateDriverProfile();
+            break;
+          case "5", "delete account":
+            deleteDriverAccount();
+            break;
+          case "6", "view all passengers":
+            showAllPassengers();
+            break;
+          case "7","add car":
+            addNewCar();
+            break;
+          case "8","view car":
+            showCar();
+            break;
+          case "9","view car models":
+            showCarModels();
+            break;
+          case "10", "log out":
+            logoutPassenger();
+            break;
+          case "11","exit":
+            exit = closingPrompt();
+            break;
+          default:
+            System.out.println("Invalid choice. Please enter a valid value.");
+            break;
         }
-      } catch (Exception e) {
-        System.out.println("Invalid input. Please enter a valid value.");
-        scanner.nextLine(); // Consume the invalid input
+//        if(choice=="11" || choice.equalsIgnoreCase("exit")){
+//          exit = closingPrompt();
+//        }
+        // handleDriverOperation(choice);
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid input! Please enter a number.");
+        //scanner.nextLine(); // Consume the invalid input
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
       }
     }
   }
-
   public void handlePassengerOperation(String choice) throws Exception {
     switch (choice) {
       case "1", "Add a new passenger" -> addNewPassenger();
@@ -200,18 +246,56 @@ public class CLI {
     }
   }
 
+  //command line prompts for creating a passenger
+  public void addNewPassenger(){
+    System.out.println("Enter the account_number: ");
+    String accountNumber = scanner.nextLine().trim();
+
+    System.out.println("Enter name: ");
+    String name = scanner.nextLine();
+
+    System.out.println("Enter gender (female/male): ");
+    String gender = scanner.nextLine();
+
+    System.out.println("Enter birth date (yy-mm-dd): ");
+    String birth_date = scanner.nextLine();
+    java.sql.Date birthDate = java.sql.Date.valueOf(birth_date);
+
+    Passenger newPassenger = new Passenger(accountNumber,name,gender,birthDate);
+    try {
+      passengerDao.addPassenger(newPassenger);
+      System.out.println("New passenger created successfully!");
+    } catch (Exception e) {
+      System.out.println("Error creating passenger: " + e.getMessage());
+    }
+  }
+
+
   public void loginDriver() {
-    System.out.println("Enter driver license: ");
+    System.out.println("Enter your driver's license: ");
     String driverLicense = scanner.nextLine().trim();
     currentDriver = driverDao.getDriver(driverLicense);
     if(currentDriver==null){
-      System.out.println("This account doesn't exist. Please register first or type right driver license");
+      System.out.println("This account doesn't exist. Please register first or type right driver's license");
       return;
     }
     isAuthenticatedDriver = true;
 
 
   }
+  public void loginPassenger() {
+    System.out.println("Enter your account number: ");
+    String accountNumber = scanner.nextLine().trim();
+    currentPassenger = passengerDao.getPassenger(accountNumber);
+    if(currentPassenger==null){
+      System.out.println("This account doesn't exist. Please register first or type right account number!");
+      return;
+    }
+    isAuthenticatedDriver = true;
+
+
+  }
+
 
   public void logoutDriver() {
 
@@ -225,6 +309,18 @@ public class CLI {
 
   }
 
+  public void logoutPassenger() {
+
+    if(!isAuthenticatedPassenger || currentPassenger==null){
+      System.out.println("Please register first or log in first");
+      return;
+    }
+    isAuthenticatedPassenger = false;
+    currentPassenger = null;
+    System.out.println("You've successfully logged out!");
+
+  }
+
   public void showDriverProfile() {
     if(!isAuthenticatedDriver || currentDriver==null){
       System.out.println("Please register or login first");
@@ -232,7 +328,13 @@ public class CLI {
     }
     System.out.println(currentDriver.toString());
   }
-
+  public void showPassengerProfile() {
+    if(!isAuthenticatedPassenger || currentPassenger==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    System.out.println(currentPassenger.toString());
+  }
   public void updateDriverProfile(){
     if(!isAuthenticatedDriver || currentDriver==null){
       System.out.println("Please register or login first");
@@ -285,6 +387,44 @@ public class CLI {
     System.out.println(currentDriver.toString());
   }
 
+  public void updatePassengerProfile(){
+    if(!isAuthenticatedPassenger || currentPassenger==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    String accountNumber = currentPassenger.getAccountNumber();
+    String name = currentPassenger.getName();
+    String gender = currentPassenger.getGender();
+    Date birthDate = currentPassenger.getBirthDate();
+
+    System.out.println("Edit name: (Press Enter to skip)");
+    String tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      name = tmp;
+    }
+
+    System.out.println("Edit gender: (Press Enter to skip) ");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      gender = tmp;
+    }
+
+    System.out.println("Edit birth date (yy-mm-dd): (Press Enter to skip)");
+    tmp = scanner.nextLine().trim();
+    if(!tmp.isEmpty()){
+      try {
+        birthDate = java.sql.Date.valueOf(tmp);
+      } catch (IllegalArgumentException e) {
+        System.out.println("Invalid date format. Please use yy-mm-dd format.");
+        return; // Exit the method if invalid date is entered
+      }
+    }
+
+    currentPassenger = passengerDao.updatePassenger(new Passenger(accountNumber,name,gender,birthDate));
+    System.out.println("Update driver profile successfully!");
+    System.out.println(currentDriver.toString());
+  }
+
   public void deleteDriverAccount(){
     if(!isAuthenticatedDriver || currentDriver == null){
       System.out.println("Only a registered member can delete their account when they log in");
@@ -294,6 +434,18 @@ public class CLI {
     isAuthenticatedDriver = false;
     currentDriver=null;
     System.out.println("Driver account successfully deleted!");
+
+  }
+
+  public void deletePassengerAccount(){
+    if(!isAuthenticatedPassenger || currentPassenger == null){
+      System.out.println("Only a registered member can delete their account when they log in");
+      return;
+    }
+    passengerDao.deletePassenger(currentPassenger.getAccountNumber());
+    isAuthenticatedPassenger = false;
+    currentPassenger=null;
+    System.out.println("Passenger account successfully deleted!");
 
   }
 
@@ -382,35 +534,6 @@ public class CLI {
 
 
 
-
-
-
-
-
-  //command line prompts for creating a passenger
-  public void addNewPassenger(){
-    System.out.println("Enter the account_number: ");
-    String accountNumber = scanner.nextLine().trim();
-
-    System.out.println("Enter name: ");
-    String name = scanner.nextLine();
-
-    System.out.println("Enter gender (female/male): ");
-    String gender = scanner.nextLine();
-
-    System.out.println("Enter birth date (yy-mm-dd): ");
-    String birth_date = scanner.nextLine();
-    java.sql.Date birthDate = java.sql.Date.valueOf(birth_date);
-
-    Passenger newPassenger = new Passenger(accountNumber,name,gender,birthDate);
-    try {
-      passengerDao.addPassenger(newPassenger);
-      System.out.println("New passenger created successfully!");
-    } catch (Exception e) {
-      System.out.println("Error creating passenger: " + e.getMessage());
-    }
-  }
-
   public void showAllDrivers(){
     List<Driver> drivers = driverDao.getAllDrivers();
     if(drivers.isEmpty()){
@@ -423,7 +546,7 @@ public class CLI {
 
   }
   public void showAllPassengers() throws SQLException {
-    List<Passenger> passengers = passengerDao.getPassengers();
+    List<Passenger> passengers = passengerDao.getAllPassengers();
     if(passengers.isEmpty()){
       System.out.println("No passengers found!");
     } else {
