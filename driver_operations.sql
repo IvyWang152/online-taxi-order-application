@@ -28,6 +28,38 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE get_driver_by_license(driver_license_p varchar(20))
+BEGIN
+	SELECT * from driver
+    where driver_license = driver_license_p;
+END $$
+DELIMITER ;
+
+-- car models
+DELIMITER $$
+CREATE PROCEDURE get_car_models()
+BEGIN
+    SELECT * FROM car_model;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE PROCEDURE add_car_model(
+    IN model_name VARCHAR(50),
+    IN make_name VARCHAR(20)
+)
+BEGIN
+    INSERT INTO car_model (model, make) VALUES (model_name, make_name);
+END $$
+DELIMITER ;
+
+CALL add_Car_model("Toyota","Corona");
+
+
+
 -- 2. CREATE: create a car
 DELIMITER $$
 CREATE PROCEDURE create_car(
@@ -45,6 +77,32 @@ END $$
 
 DELIMITER ;
 
+CALL create_car('6666',2,4,'red',false,'admin');
+
+DELIMITER $$
+CREATE PROCEDURE get_car_of_driver(driver_license_p varchar(20))
+BEGIN
+	DECLARE res INT;
+    
+	SELECT COUNT(*) INTO res FROM car WHERE driver_license = driver_license_p;
+	IF res=0 THEN
+		SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'No car registered under this driver account';
+	END IF;
+    SELECT * FROM car WHERE driver_license = driver_license_p;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE get_cars()
+BEGIN
+	SELECT * FROM car;
+END $$
+
+DELIMITER ;
+
+Call get_cars();
 
 -- 3. READ: get_availble_orders
 DROP PROCEDURE IF EXISTS get_orders;
