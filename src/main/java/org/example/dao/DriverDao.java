@@ -105,10 +105,10 @@ public class DriverDao {
   }
 
 
-  public void deleteDriver(int id) {
-    // SQL query or stored procedure call to delete a driver
 
-  }
+
+
+
 
   private Driver mapRowToDriver(ResultSet rs) throws SQLException {
     Driver driver = new Driver();

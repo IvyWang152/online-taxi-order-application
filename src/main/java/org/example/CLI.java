@@ -5,8 +5,11 @@ import java.util.InputMismatchException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
+import org.example.dao.CarDao;
 import org.example.dao.DriverDao;
 import org.example.dao.PassengerDao;
+import org.example.model.Car;
+import org.example.model.CarModel;
 import org.example.model.Driver;
 import org.example.model.Passenger;
 
@@ -14,11 +17,14 @@ public class CLI {
   private final Scanner scanner;
   private final DriverDao driverDao;
   private final PassengerDao passengerDao;
+  private final CarDao carDao;
 
   public CLI() {
     this.scanner = new Scanner(System.in);
     this.driverDao = new DriverDao();
     this.passengerDao = new PassengerDao();
+    this.carDao = new CarDao();
+
   }
 
   public void start() throws Exception {
@@ -73,6 +79,9 @@ public class CLI {
         System.out.println("4. update profile");
         System.out.println("5. delete account");
         System.out.println("6. view all drivers");
+        System.out.println("7. add car");
+        System.out.println("8. view car");
+        System.out.println("9. view car models");
         System.out.println("10. log out");
       }
 
@@ -97,6 +106,15 @@ public class CLI {
             break;
           case "6", "view all drivers":
             showAllDrivers();
+            break;
+          case "7","add car":
+            addNewCar();
+            break;
+          case "8","view car":
+            showCar();
+            break;
+          case "9","view car models":
+            showCarModels();
             break;
           case "10", "log out":
             logoutDriver();
@@ -154,6 +172,7 @@ public class CLI {
       default -> System.out.println("Invalid choice. Please enter a value.");
     }
   }
+
   //command line prompts for creating a driver
   public void addNewDriver(){
     System.out.println("Enter driver license: ");
@@ -277,6 +296,94 @@ public class CLI {
     System.out.println("Driver account successfully deleted!");
 
   }
+
+  //Car logic
+  public void addNewCar(){
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    System.out.println("Enter car plate: ");
+    String plate = scanner.nextLine().trim();
+
+    int carModelId = 0;
+    int carCapacity = 0;
+    boolean accessibility;
+
+    // Handling car model id input
+    while (true) {
+      System.out.println("Enter car model id: ");
+      String carModelIdS = scanner.nextLine().trim();
+      try {
+        carModelId = Integer.valueOf(carModelIdS);
+        break; // Break out of the loop if conversion is successful
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter an integer for car model id.");
+      }
+    }
+
+    // Handling car capacity input
+    while (true) {
+      System.out.println("Enter car capacity: ");
+      String carCapacityS = scanner.nextLine().trim();
+      try {
+        carCapacity = Integer.valueOf(carCapacityS);
+        break; // Break out of the loop if conversion is successful
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter an integer for car capacity.");
+      }
+    }
+
+    System.out.println("Enter car color: ");
+    String color = scanner.nextLine().trim();
+
+    while (true) {
+      System.out.println("Enter car accessibility (true or false): ");
+      String accessibilityS = scanner.nextLine().trim().toLowerCase();
+
+      if (accessibilityS.equals("true") || accessibilityS.equals("false")) {
+        accessibility = Boolean.valueOf(accessibilityS);
+        break; // Break out of the loop if input is "true" or "false"
+      } else {
+        System.out.println("Invalid input. Please enter true or false for accessibility.");
+      }
+    }
+    Car car = new Car(plate,carModelId,carCapacity,color,accessibility,
+        currentDriver.getDriverLicense());
+    try {
+      carDao.addCar(car);
+    } catch (Exception e) {
+      System.out.println("Error creating car: " + e.getMessage());
+    }
+
+  }
+
+  public void showCar(){
+    if(!isAuthenticatedDriver || currentDriver==null){
+      System.out.println("Please register or login first");
+      return;
+    }
+    List<Car> cars = carDao.getCarsOfDriver(currentDriver.getDriverLicense());
+    for(Car each: cars){
+      System.out.println(each.toString());
+    }
+  }
+
+  public void showCarModels(){
+    if(!isAuthenticatedDriver || currentDriver==null) {
+      System.out.println("Please register or login first");
+      return;
+    }
+    List<CarModel> models = carDao.getCarModels();
+    for(CarModel model: models){
+      System.out.println(model.toString());
+  }
+  }
+
+
+
+
+
 
 
 
