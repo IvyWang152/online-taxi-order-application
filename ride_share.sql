@@ -30,7 +30,7 @@ CREATE TABLE car (
     color VARCHAR(20),
     accessibility BOOL,
     driver_license varchar(20),
-    location varchar(255),
+    location varchar(255) DEFAULT NULL,
     FOREIGN KEY(car_model_id) REFERENCES car_model(car_model_id) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (driver_license) REFERENCES driver(driver_license) ON UPDATE CASCADE ON DELETE RESTRICT
 );
@@ -78,7 +78,6 @@ CREATE TABLE passenger_payment (
 CREATE TABLE ride_order (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     order_date DATE,
-    order_time TIME,
     desired_capacity INT,
     accessibility bool,
     fare DECIMAL(10, 2) DEFAULT 0,
@@ -87,7 +86,7 @@ CREATE TABLE ride_order (
     order_status ENUM('available', 'completed', 'canceled', 'in progress') DEFAULT 'available',
     account_number VARCHAR(20),
     fare_policy_name VARCHAR(255),
-    car_plate VARCHAR(20),
+    car_plate VARCHAR(20) DEFAULT NULL,
     start_city VARCHAR(255),
     end_city VARCHAR(255),
     

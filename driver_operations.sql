@@ -57,8 +57,10 @@ END $$
 DELIMITER ;
 
 CALL add_Car_model("Toyota","Corona");
-
-
+CALL add_Car_model("Nissan","ARIYA");
+CALL add_Car_model("Volvo","XC90");
+CALL add_Car_model("Honda","Accord");
+CALL add_Car_model("Lexus","LS");
 
 -- 2. CREATE: create a car
 DELIMITER $$
@@ -216,6 +218,7 @@ BEGIN
 	DELETE FROM car WHERE driver_license = OLD.driver_license;
 END $$
 DELIMITER ;
+
 
 
 
