@@ -13,17 +13,24 @@ BEGIN
 INSERT INTO passenger(account_number, name, gender, birth_date) 
 VALUES (account_number, name,gender,birth_date);
 END $$
+DELIMITER $$
+CREATE PROCEDURE get_passengers()
+BEGIN
+	SELECT * from passenger;
+END $$
 
+DELIMITER ;
+
+DELIMITER $$
 DELIMITER ;
 -- get passenger by account_number
 DELIMITER $$
-CREATE PROCEDURE get_passenger_by_account_number(account_number varchar(20))
+CREATE PROCEDURE get_passeger_by_account_number(account_number varchar(20))
 BEGIN
 	SELECT * from passenger
     where account_number = account_number;
 END $$
 DELIMITER ;
-
 
 -- READ: read all available cars
 DELIMITER //
@@ -105,6 +112,15 @@ BEGIN
 END //
 
 DELIMITER ;
+-- 8. DELETE: delete passenger and automatically delete their orders (trigger)
+DELIMITER $$
+CREATE PROCEDURE delete_passenger_account(
+	account_number  varchar(20)
+)
+BEGIN
+	DELETE FROM passenger WHERE account_number = account_number;
+END $$
+DELIMITER ;
 
 DELIMITER //
 
@@ -136,15 +152,6 @@ END;
 //
 DELIMITER ;
 
-DELIMITER ;
--- 8. DELETE: delete passenger and automatically delete their orders (trigger)
-DELIMITER $$
-CREATE PROCEDURE delete_passenger_account(
-	account_number_p  varchar(20)
-)
-BEGIN
-	DELETE FROM passenger WHERE account_number = account_number_p;
-END $$
-DELIMITER ;
 
-SELECT ride_orderlocation* FROM passenger;
+
+

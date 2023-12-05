@@ -29,7 +29,7 @@ public class CLI {
 
   public void start() throws Exception {
     System.out.println("***** Welcome to Taxi Order Dashboard! *****");
-    System.out.println("To get started, please choose your role (1 or 2)");
+    System.out.println("To get started, please choose your role!");
     System.out.println("1. driver");
     System.out.println("2. passenger");
     System.out.println("3. Exit");
