@@ -20,7 +20,7 @@ DELIMITER ;
 CALL create_driver('AB6X','admin','unknown','2000-01-01','Malden');
 CALL create_driver('TT0TT','Harry','male','1986-10-13','Hagwarts');
 CALL create_driver('MMB122','Micy','female','2200-11-07','Texas');
-passenger
+
 DELIMITER $$
 CREATE PROCEDURE get_drivers()
 BEGIN
@@ -77,7 +77,7 @@ END $$
 
 DELIMITER ;
 
-CALL create_car('6666',2,4,'red',false,'admin');
+-- CALL create_car('6666',2,4,'red',false,'admin');
 
 DELIMITER $$
 CREATE PROCEDURE get_car_of_driver(driver_license_p varchar(20))
@@ -93,6 +93,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 
 DELIMITER $$
 CREATE PROCEDURE get_cars()
