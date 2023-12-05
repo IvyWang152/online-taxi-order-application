@@ -38,21 +38,24 @@ public class CLI {
 
     do {
       System.out.print("Enter your choice number or role name: ");
-      String userChoice = scanner.next().toLowerCase().trim();
-      scanner.nextLine();
+      String userChoice = scanner.nextLine().toLowerCase().trim();
+      //scanner.nextLine();
 
       switch (userChoice) {
         case "1", "driver" -> {
           showDriverMenu();
           validInput = true;
+          break;
         }
         case "2", "passenger" -> {
           showPassengerMenu();
           validInput = true;
+          break;
         }
         case "3", "exit" -> {
           if (closingPrompt()) {
             validInput = true;
+            break;
           }
         }
         default ->
@@ -152,9 +155,6 @@ public class CLI {
         System.out.println("4. update profile");
         System.out.println("5. delete account");
         System.out.println("6. view all passengers");
-        System.out.println("7. add car");
-        System.out.println("8. view car");
-        System.out.println("9. view car models");
         System.out.println("10. log out");
       }
       try {
@@ -162,31 +162,22 @@ public class CLI {
         String choice = scanner.nextLine().toLowerCase();
         switch(choice) {
           case "1", "register":
-            addNewDriver();
+            addNewPassenger();
             break;
           case "2", "log in":
-            loginDriver();
+            loginPassenger();
             break;
           case "3", "view profile":
-            showDriverProfile();
+            showPassengerProfile();
             break;
           case "4", "update profile":
-            updateDriverProfile();
+            updatePassengerProfile();
             break;
           case "5", "delete account":
-            deleteDriverAccount();
+            deletePassengerAccount();
             break;
           case "6", "view all passengers":
             showAllPassengers();
-            break;
-          case "7","add car":
-            addNewCar();
-            break;
-          case "8","view car":
-            showCar();
-            break;
-          case "9","view car models":
-            showCarModels();
             break;
           case "10", "log out":
             logoutPassenger();
@@ -227,7 +218,7 @@ public class CLI {
     System.out.println("Enter name: ");
     String name = scanner.nextLine();
 
-    System.out.println("Enter gender (female/male): ");
+    System.out.println("Enter gender: ");
     String gender = scanner.nextLine();
 
     System.out.println("Enter birth date (yy-mm-dd): ");
@@ -254,7 +245,7 @@ public class CLI {
     System.out.println("Enter name: ");
     String name = scanner.nextLine();
 
-    System.out.println("Enter gender (female/male): ");
+    System.out.println("Enter gender: ");
     String gender = scanner.nextLine();
 
     System.out.println("Enter birth date (yy-mm-dd): ");
@@ -291,7 +282,7 @@ public class CLI {
       System.out.println("This account doesn't exist. Please register first or type right account number!");
       return;
     }
-    isAuthenticatedDriver = true;
+    isAuthenticatedPassenger = true;
 
 
   }
@@ -328,6 +319,7 @@ public class CLI {
     }
     System.out.println(currentDriver.toString());
   }
+
   public void showPassengerProfile() {
     if(!isAuthenticatedPassenger || currentPassenger==null){
       System.out.println("Please register or login first");
@@ -335,6 +327,7 @@ public class CLI {
     }
     System.out.println(currentPassenger.toString());
   }
+
   public void updateDriverProfile(){
     if(!isAuthenticatedDriver || currentDriver==null){
       System.out.println("Please register or login first");
@@ -353,7 +346,7 @@ public class CLI {
       name = tmp;
     }
 
-    System.out.println("Edit gender (female/male): (Press Enter to skip) ");
+    System.out.println("Edit gender: (Press Enter to skip)");
     tmp = scanner.nextLine().trim();
     if(!tmp.isEmpty()){
       gender = tmp;
@@ -376,10 +369,22 @@ public class CLI {
       address = tmp;
     }
 
-    System.out.println("Edit availability (true or false): (Press Enter to skip)");
-    tmp = scanner.nextLine().trim();
-    if(!tmp.isEmpty()){
-      isAvailable = Boolean.parseBoolean(tmp);
+//    System.out.println("Edit availability (true or false): (Press Enter to skip)");
+//    tmp = scanner.nextLine().trim();
+//    if(!tmp.isEmpty()){
+//      isAvailable = Boolean.parseBoolean(tmp);
+//    }
+
+    while (true) {
+      System.out.println("Edit availability (true or false): (Press Enter to skip)");
+      String availability = scanner.nextLine().trim().toLowerCase();
+
+      if (availability.equals("true") || availability.equals("false")) {
+        isAvailable = Boolean.valueOf(availability);
+        break; // Break out of the loop if input is "true" or "false"
+      } else {
+        System.out.println("Invalid input. Please enter true or false for accessibility.");
+      }
     }
 
     currentDriver = driverDao.updateDriver(new Driver(driverLicense,name,gender,birthDate,address,isAvailable));
@@ -422,7 +427,7 @@ public class CLI {
 
     currentPassenger = passengerDao.updatePassenger(new Passenger(accountNumber,name,gender,birthDate));
     System.out.println("Update driver profile successfully!");
-    System.out.println(currentDriver.toString());
+    System.out.println(currentPassenger.toString());
   }
 
   public void deleteDriverAccount(){

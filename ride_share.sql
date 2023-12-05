@@ -11,13 +11,6 @@ CREATE TABLE car_model (
 -- make: Toyota, Tesla
 -- model: toyota-camry; toyota-rav4
 
--- Creating Location table: geographical location used to locate drivers and passengers
-CREATE TABLE location (
-    location_id INT AUTO_INCREMENT PRIMARY KEY,
-    latitude DOUBLE,
-    longitude DOUBLE
-);
-
 
 -- Creating Driver table
 CREATE TABLE driver (
@@ -37,6 +30,7 @@ CREATE TABLE car (
     color VARCHAR(20),
     accessibility BOOL,
     driver_license varchar(20),
+    location varchar(255),
     FOREIGN KEY(car_model_id) REFERENCES car_model(car_model_id) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (driver_license) REFERENCES driver(driver_license) ON UPDATE CASCADE ON DELETE RESTRICT
 );
@@ -53,6 +47,13 @@ CREATE TABLE fare_policy(
     base_fare DECIMAL(10, 2),
     per_mile_rate DECIMAL(10, 2),
     cancellation_fee DECIMAL(10, 2)
+);
+
+CREATE TABLE commute_distance(
+	start_city VARCHAR(255),
+    end_city VARCHAR(255),
+    distance DECIMAL(10,2),
+    PRIMARY KEY (start_city, end_city)
 );
 
 -- Creating Passenger table
@@ -78,23 +79,26 @@ CREATE TABLE ride_order (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     order_date DATE,
     order_time TIME,
-    desired_make VARCHAR(20),
-    desired_model VARCHAR(20),
     desired_capacity INT,
-    fare DECIMAL(10, 2),
-    driver_review INT,
-    passenger_review INT,
+    accessibility bool,
+    fare DECIMAL(10, 2) DEFAULT 0,
+    driver_review INT DEFAULT 0,
+    passenger_review INT DEFAULT 0,
     order_status ENUM('available', 'completed', 'canceled', 'in progress') DEFAULT 'available',
     account_number VARCHAR(20),
     fare_policy_name VARCHAR(255),
     car_plate VARCHAR(20),
-    pickup_location INT,
-    destination_location INT,
+    start_city VARCHAR(255),
+    end_city VARCHAR(255),
+    
     FOREIGN KEY (account_number) REFERENCES passenger(account_number) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (fare_policy_name) REFERENCES fare_policy(name) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (car_plate) REFERENCES car(plate) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (pickup_location) REFERENCES location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (destination_location) REFERENCES location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT
+    CONSTRAINT fk_commute_distance
+        FOREIGN KEY (start_city, end_city)
+        REFERENCES commute_distance(start_city, end_city)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+    -- FOREIGN KEY (start_city, end_city) REFERENCES commute_distance(start_city,end_city) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 

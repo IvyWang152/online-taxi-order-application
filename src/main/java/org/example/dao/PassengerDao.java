@@ -50,7 +50,7 @@ public class PassengerDao {
     return null;
   }
   public Passenger updatePassenger(Passenger passenger){
-    String procedureCall = "{CALL update_driver_details(?, ?, ?, ?)}";
+    String procedureCall = "{CALL update_user_profile(?, ?, ?, ?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
       stmt.setString(1, passenger.getAccountNumber());
