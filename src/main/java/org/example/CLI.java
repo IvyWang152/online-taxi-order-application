@@ -369,12 +369,6 @@ public class CLI {
       address = tmp;
     }
 
-//    System.out.println("Edit availability (true or false): (Press Enter to skip)");
-//    tmp = scanner.nextLine().trim();
-//    if(!tmp.isEmpty()){
-//      isAvailable = Boolean.parseBoolean(tmp);
-//    }
-
     while (true) {
       System.out.println("Edit availability (true or false): (Press Enter to skip)");
       String availability = scanner.nextLine().trim().toLowerCase();
