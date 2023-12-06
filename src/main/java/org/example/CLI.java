@@ -134,6 +134,7 @@ public class CLI {
         System.out.println("9. Create an order (Please check the available routes first (11. view routes)");
         System.out.println("10. log out");
         System.out.println("11. view routes");
+        System.out.println("12. Update orders");
       }
       try {
         System.out.print("Enter command number: ");
@@ -150,11 +151,11 @@ public class CLI {
           case "10", "log out" -> logoutPassenger();
           case "3", "exit" -> exit = closingPrompt();
           case "11","view routes"-> showRoutes();
+          case "12", "update orders" -> updateOrder(); // New option to update orders
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
       } catch (InputMismatchException e) {
         System.out.println("Invalid input! Please enter a number.");
-        //scanner.nextLine(); // Consume the invalid input
       } catch (SQLException e) {
         throw new RuntimeException(e);
       }
@@ -171,11 +172,6 @@ public class CLI {
 
   //command line prompts for creating a driver
   public void addNewDriver(){
-//    System.out.println("Enter driver license: ");
-//    String driverLicense = scanner.nextLine().trim();
-//    if (driverLicense.isEmpty()) {
-//      throw new IllegalArgumentException("Driver license cannot be empty");
-//    }
     String driverLicense;
     while (true) {
       System.out.println("Enter driver license: ");
@@ -530,7 +526,7 @@ public class CLI {
       String accessibilityS = scanner.nextLine().trim().toLowerCase();
 
       if (accessibilityS.equals("true") || accessibilityS.equals("false")) {
-        accessibility = Boolean.valueOf(accessibilityS);
+        accessibility = Boolean.parseBoolean(accessibilityS);
         break; // Break out of the loop if input is "true" or "false"
       } else {
         System.out.println("Invalid input. Please enter true or false for accessibility.");
@@ -694,6 +690,112 @@ public class CLI {
 
     Order newOrder = new Order(orderDate, desiredCapacity, accessibility, startCity, endCity, accountNumber);
     passengerDao.createOrder(newOrder);
+  }
+  public void updateOrder() {
+    if (!isAuthenticatedPassenger || currentPassenger == null) {
+      System.out.println("Please log in first");
+      loginPassenger(); // Prompt the user to log in
+      if (currentPassenger == null) {
+        System.out.println("Login failed. Aborting order update.");
+        return;
+      }
+    }
+
+    // Display passenger's orders
+    List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    if (orders.isEmpty()) {
+      System.out.println("No orders found for this passenger.");
+      return;
+    } else {
+      System.out.println("Your Orders:");
+      for (Order order : orders) {
+        System.out.println(order.toString());
+      }
+    }
+
+    // Prompt passenger to choose an order to update
+    System.out.println("Enter the Order ID you want to update: ");
+    int orderId;
+    try {
+      orderId = Integer.parseInt(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid input. Please enter a valid Order ID.");
+      return;
+    }
+
+    // Check if the provided Order ID exists and is associated with the current passenger
+    boolean isValidOrderId = orders.stream().anyMatch(order -> order.getId() == orderId);
+    if (!isValidOrderId) {
+      System.out.println("Invalid Order ID. Please enter a valid Order ID.");
+      return;
+    }
+
+    // Prompt passenger to choose what to update
+    System.out.println("Select what you want to update:");
+    System.out.println("1. Update desired capacity");
+    System.out.println("2. Update accessibility");
+    System.out.println("3. Update start and end cities");
+    System.out.println("4. Cancel");
+
+    String updateChoice = scanner.nextLine().trim();
+
+    switch (updateChoice) {
+      case "1":
+        // Update desired capacity
+        updateOrderCapacity(orderId);
+        break;
+      case "2":
+        // Update accessibility
+        updateOrderAccessibility(orderId);
+        break;
+      case "3":
+        // Update start and end cities
+        updateOrderRoute(orderId);
+        break;
+      case "4":
+        // Cancel the update
+        System.out.println("Update canceled.");
+        break;
+      default:
+        System.out.println("Invalid choice. Please enter a valid option.");
+    }
+  }
+
+  private void updateOrderCapacity(int orderId) {
+    System.out.println("Enter new desired capacity: ");
+    int newCapacity;
+    try {
+      newCapacity = Integer.parseInt(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid input. Please enter an integer for desired capacity.");
+      return;
+    }
+    orderDao.updateOrderCapacity(orderId, newCapacity);
+    System.out.println("Desired capacity updated successfully.");
+  }
+
+  private void updateOrderAccessibility(int orderId) {
+    System.out.println("Enter new accessibility (true or false): ");
+    boolean newAccessibility;
+    String accessibilityInput = scanner.nextLine().trim().toLowerCase();
+    if (accessibilityInput.equalsIgnoreCase("true") || accessibilityInput.equalsIgnoreCase("false")) {
+      newAccessibility = Boolean.parseBoolean(accessibilityInput);
+      orderDao.updateOrderAccessibility(orderId, newAccessibility);
+      System.out.println("Accessibility updated successfully.");
+    } else {
+      System.out.println("Invalid input. Please enter true or false for accessibility.");
+    }
+  }
+
+  private void updateOrderRoute(int orderId) {
+    System.out.println("Enter new start city: ");
+    String newStartCity = scanner.nextLine().trim();
+
+    System.out.println("Enter new end city: ");
+    String newEndCity = scanner.nextLine().trim();
+
+    orderDao.updateOrderRoute(orderId, newStartCity, newEndCity);
+    System.out.println("Start and end cities updated successfully.");
   }
 
 
