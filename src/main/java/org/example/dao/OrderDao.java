@@ -269,4 +269,19 @@ public class OrderDao {
     return orders;
   }
 
+  public void deleteOrder(int orderId) {
+    String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
+
+    try (Connection conn = DBConnector.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(deleteOrderQuery)) {
+
+      stmt.setInt(1, orderId);
+      stmt.executeUpdate();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+      throw new RuntimeException("Error deleting order: " + e.getMessage());
+    }
+  }
 }

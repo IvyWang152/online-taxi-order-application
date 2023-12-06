@@ -612,7 +612,8 @@ public class CLI {
       return;
     }
 
-    List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    //List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    List<Order> orders = orderDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     if (orders.isEmpty()) {
       System.out.println("No orders found for this passenger.");
     } else {
@@ -705,7 +706,8 @@ public class CLI {
     }
 
     // Display passenger's orders
-    List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    //List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    List<Order> orders = orderDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     if (orders.isEmpty()) {
       System.out.println("No orders found for this passenger.");
       return;
@@ -802,7 +804,8 @@ public class CLI {
     }
 
     // Display passenger's orders
-    List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    //List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    List<Order> orders = orderDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     if (orders.isEmpty()) {
       System.out.println("No orders found for this passenger.");
       return;
@@ -835,7 +838,8 @@ public class CLI {
     String confirmation = scanner.nextLine().trim().toLowerCase();
     if (confirmation.equals("yes")) {
       // Delete the order
-      passengerDao.deleteOrder(orderId);
+      //passengerDao.deleteOrder(orderId);
+      orderDao.deleteOrder(orderId);
       System.out.println("Order deleted successfully.");
     } else {
       System.out.println("Deletion canceled.");

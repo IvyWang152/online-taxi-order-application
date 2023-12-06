@@ -104,93 +104,93 @@ public class PassengerDao {
     return passenger;
   }
 
-  public void createOrder(Order order) {
-    String procedureCall = "{CALL create_order(?, ?, ?, ?, ?, ?)}";
-    try (Connection conn = DBConnector.getConnection();
-         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+//  public void createOrder(Order order) {
+//    String procedureCall = "{CALL create_order(?, ?, ?, ?, ?, ?)}";
+//    try (Connection conn = DBConnector.getConnection();
+//         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+//
+//      stmt.setDate(1, new java.sql.Date(order.getOrderDate().getTime()));
+//      stmt.setInt(2, order.getDesiredCapacity());
+//      stmt.setBoolean(3, order.getAccessibility());
+//      stmt.setString(4, order.getAccountNumber());
+//      stmt.setString(5, order.getStartCity());
+//      stmt.setString(6, order.getEndCity());
+//
+//      stmt.execute();
+//      System.out.println("Order created successfully!");
+//
+//    } catch (SQLException e) {
+//      if (e.getMessage().contains("FOREIGN KEY (`start_city`, `end_city`)")) {
+//        // Handle duplicate entry
+//        System.out.println(
+//                String.format("Error: There's no route from %s to %s. Please view existing city routes",
+//                        order.getStartCity(), order.getEndCity()));
+//      } else {
+//        System.err.println("Error creating order: " + e.getMessage());
+//
+//        throw new RuntimeException("Failed to create order", e);
+//      }
+//    }
+//  }
+//
+//  public List<Order> getOrdersForPassenger(String accountNumber) {
+//    List<Order> orders = new ArrayList<>();
+//    String procedureCall = "{CALL get_orders_for_passenger(?)}";
+//
+//    try (Connection conn = DBConnector.getConnection();
+//         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+//
+//      stmt.setString(1, accountNumber);
+//
+//      try (ResultSet rs = stmt.executeQuery()) {
+//        while (rs.next()) {
+//          Order order = mapRowToOrder(rs);
+//          orders.add(order);
+//        }
+//      }
+//    } catch (SQLException e) {
+//      e.printStackTrace();
+//      // Handle or log the error appropriately
+//    }
+//
+//    return orders;
+//  }
+//
+//  private Order mapRowToOrder(ResultSet rs) throws SQLException {
+//    Order order = new Order();
+//    order.setId(rs.getInt("id"));
+//    order.setOrderDate(rs.getDate("order_date"));
+//    order.setAccountNumber(rs.getString("account_number"));
+//    order.setDesiredCapacity(rs.getInt("desired_capacity"));
+//    order.setAccessibility(rs.getBoolean("accessibility"));
+//    order.setStartCity(rs.getString("start_city"));
+//    order.setEndCity(rs.getString("end_city"));
+//    order.setCarPlate(rs.getString("car_plate"));
+//
+//
+//    // Set other attributes of the Order class based on your model
+//    order.setDriverReview(rs.getInt("driver_review"));
+//    order.setPassengerReview(rs.getInt("passenger_review"));
+//    order.setOrderStatus(rs.getString("order_status"));
+//    order.setFare(rs.getDouble("fare"));
+//
+//    return order;
+//  }
 
-      stmt.setDate(1, new java.sql.Date(order.getOrderDate().getTime()));
-      stmt.setInt(2, order.getDesiredCapacity());
-      stmt.setBoolean(3, order.getAccessibility());
-      stmt.setString(4, order.getAccountNumber());
-      stmt.setString(5, order.getStartCity());
-      stmt.setString(6, order.getEndCity());
 
-      stmt.execute();
-      System.out.println("Order created successfully!");
-
-    } catch (SQLException e) {
-      if (e.getMessage().contains("FOREIGN KEY (`start_city`, `end_city`)")) {
-        // Handle duplicate entry
-        System.out.println(
-                String.format("Error: There's no route from %s to %s. Please view existing city routes",
-                        order.getStartCity(), order.getEndCity()));
-      } else {
-        System.err.println("Error creating order: " + e.getMessage());
-
-        throw new RuntimeException("Failed to create order", e);
-      }
-    }
-  }
-
-  public List<Order> getOrdersForPassenger(String accountNumber) {
-    List<Order> orders = new ArrayList<>();
-    String procedureCall = "{CALL get_orders_for_passenger(?)}";
-
-    try (Connection conn = DBConnector.getConnection();
-         CallableStatement stmt = conn.prepareCall(procedureCall)) {
-
-      stmt.setString(1, accountNumber);
-
-      try (ResultSet rs = stmt.executeQuery()) {
-        while (rs.next()) {
-          Order order = mapRowToOrder(rs);
-          orders.add(order);
-        }
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-      // Handle or log the error appropriately
-    }
-
-    return orders;
-  }
-
-  private Order mapRowToOrder(ResultSet rs) throws SQLException {
-    Order order = new Order();
-    order.setId(rs.getInt("id"));
-    order.setOrderDate(rs.getDate("order_date"));
-    order.setAccountNumber(rs.getString("account_number"));
-    order.setDesiredCapacity(rs.getInt("desired_capacity"));
-    order.setAccessibility(rs.getBoolean("accessibility"));
-    order.setStartCity(rs.getString("start_city"));
-    order.setEndCity(rs.getString("end_city"));
-    order.setCarPlate(rs.getString("car_plate"));
-
-
-    // Set other attributes of the Order class based on your model
-    order.setDriverReview(rs.getInt("driver_review"));
-    order.setPassengerReview(rs.getInt("passenger_review"));
-    order.setOrderStatus(rs.getString("order_status"));
-    order.setFare(rs.getDouble("fare"));
-
-    return order;
-  }
-
-
-  public void deleteOrder(int orderId) {
-    String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
-
-    try (Connection conn = DBConnector.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(deleteOrderQuery)) {
-
-      stmt.setInt(1, orderId);
-      stmt.executeUpdate();
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-      // Handle or log the error appropriately
-      throw new RuntimeException("Error deleting order: " + e.getMessage());
-    }
-  }
+//  public void deleteOrder(int orderId) {
+//    String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
+//
+//    try (Connection conn = DBConnector.getConnection();
+//         PreparedStatement stmt = conn.prepareStatement(deleteOrderQuery)) {
+//
+//      stmt.setInt(1, orderId);
+//      stmt.executeUpdate();
+//
+//    } catch (SQLException e) {
+//      e.printStackTrace();
+//      // Handle or log the error appropriately
+//      throw new RuntimeException("Error deleting order: " + e.getMessage());
+//    }
+//  }
 }
