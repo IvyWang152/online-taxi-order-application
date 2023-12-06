@@ -305,7 +305,7 @@ public class CLI {
       System.out.println("Please register or login first");
       return;
     }
-    System.out.println(currentDriver.toString());
+    System.out.println(currentDriver);
   }
 
   public void showPassengerProfile() {
@@ -466,7 +466,7 @@ public class CLI {
       System.out.println("Enter car capacity: ");
       String carCapacityS = scanner.nextLine().trim();
       try {
-        carCapacity = Integer.valueOf(carCapacityS);
+        carCapacity = Integer.parseInt(carCapacityS);
         break; // Break out of the loop if conversion is successful
       } catch (NumberFormatException e) {
         System.out.println("Invalid input. Please enter an integer for car capacity.");
@@ -595,46 +595,57 @@ public class CLI {
         return;
       }
     }
+
     String accountNumber = currentPassenger.getAccountNumber();
     LocalDate currentDate = LocalDate.now(); // This gets the current date
     java.sql.Date orderDate = java.sql.Date.valueOf(currentDate); // Convert to sql.Date
 
-    System.out.println("Enter start city: ");
-    String startCity = scanner.nextLine().trim();
-    if (startCity.isEmpty()) {
-      System.out.println("Pick up name cannot be empty. Please enter a valid name.");
-      return;
-    }
-    System.out.println("Enter drop off city: ");
-    String endCity = scanner.nextLine().trim();
-    if (endCity.isEmpty()) {
-      System.out.println("Drop off name cannot be empty. Please enter a valid name.");
-      return;
-    }
+    String startCity;
+    do {
+      System.out.println("Enter pick up city: ");
+      startCity = scanner.nextLine().trim();
+      if (startCity.isEmpty()) {
+        System.out.println("Pick up name cannot be empty. Please enter a valid name.");
+      }
+    } while (startCity.isEmpty());
 
-    System.out.println("Enter desired capacity: ");
+    String endCity;
+    do {
+      System.out.println("Enter drop off city: ");
+      endCity = scanner.nextLine().trim();
+      if (endCity.isEmpty()) {
+        System.out.println("Drop off name cannot be empty. Please enter a valid name.");
+      } else if (startCity.equalsIgnoreCase(endCity)) {
+        System.out.println("Pick-up and drop-off cities cannot be the same. Please enter different cities.");
+      }
+    } while (endCity.isEmpty() || startCity.equalsIgnoreCase(endCity));
+
     int desiredCapacity;
-    try {
-      desiredCapacity = Integer.parseInt(scanner.nextLine().trim());
-    } catch (NumberFormatException e) {
-      System.out.println("Invalid input. Please enter an integer for desired capacity.");
-      return;
-    }
+    do {
+      System.out.println("Enter desired capacity: ");
+      try {
+        desiredCapacity = Integer.parseInt(scanner.nextLine().trim());
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter an integer for desired capacity.");
+        desiredCapacity = -1; // Set an invalid value to continue the loop
+      }
+    } while (desiredCapacity < 0);
 
-    System.out.println("Enter accessibility (true or false): ");
-    boolean accessibility;
-    String accessibilityInput = scanner.nextLine().trim().toLowerCase();
-    if (accessibilityInput.equals("true") || accessibilityInput.equals("false")) {
-      accessibility = Boolean.parseBoolean(accessibilityInput);
-    } else {
-      System.out.println("Invalid input. Please enter true or false for accessibility.");
-      return;
-    }
+    boolean accessibility = false;
+    String accessibilityInput;
+    do {
+      System.out.println("Enter accessibility (true or false): ");
+      accessibilityInput = scanner.nextLine().trim().toLowerCase();
+      if (accessibilityInput.equalsIgnoreCase("true") || accessibilityInput.equalsIgnoreCase("false")) {
+        accessibility = Boolean.parseBoolean(accessibilityInput);
+      } else {
+        System.out.println("Invalid input. Please enter true or false for accessibility.");
+      }
+    } while (!accessibilityInput.equalsIgnoreCase("true") && !accessibilityInput.equalsIgnoreCase("false"));
 
     Order newOrder = new Order(orderDate, desiredCapacity, accessibility, startCity, endCity, accountNumber);
-
     passengerDao.createOrder(newOrder);
-
   }
+
 
 }
