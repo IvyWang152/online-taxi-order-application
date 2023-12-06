@@ -21,8 +21,6 @@ END $$
 
 DELIMITER ;
 
-DELIMITER $$
-DELIMITER ;
 -- get passenger by account_number
 DELIMITER $$
 CREATE PROCEDURE get_passenger_by_account_number(account_number_p varchar(20))
@@ -50,26 +48,11 @@ BEGIN
     JOIN car_model ON car.car_model_id = car_model.car_model_id
     JOIN driver ON car.driver_license = driver.driver_license
     WHERE
-        car.is_available = TRUE;
+        driver.is_available = TRUE;
 END //
 
 DELIMITER //
--- UPDATE: update order(eg: location, car choice)
-CREATE PROCEDURE update_ride_order(
-    IN order_id INT,
-    IN new_location_id INT,
-    IN new_car_plate VARCHAR(20)
-)
-BEGIN
-    UPDATE ride_order
-    SET
-        pickup_location = new_location_id,
-        car_plate = new_car_plate
-    WHERE
-        id = order_id;
-END //
 
-DELIMITER ;
 
 DELIMITER //
 -- UPDATE: update user profile

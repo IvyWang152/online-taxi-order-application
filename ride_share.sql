@@ -42,13 +42,6 @@ CREATE TABLE payment_method (
 );
 
 
-CREATE TABLE fare_policy(
-	name VARCHAR(255) PRIMARY KEY,
-    base_fare DECIMAL(10, 2),
-    per_mile_rate DECIMAL(10, 2),
-    cancellation_fee DECIMAL(10, 2)
-);
-
 CREATE TABLE commute_distance(
 	start_city VARCHAR(255),
     end_city VARCHAR(255),
@@ -85,13 +78,11 @@ CREATE TABLE ride_order (
     passenger_review INT DEFAULT 0,
     order_status ENUM('available', 'completed', 'canceled', 'in progress') DEFAULT 'available',
     account_number VARCHAR(20),
-    fare_policy_name VARCHAR(255),
     car_plate VARCHAR(20) DEFAULT NULL,
     start_city VARCHAR(255),
     end_city VARCHAR(255),
     
     FOREIGN KEY (account_number) REFERENCES passenger(account_number) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (fare_policy_name) REFERENCES fare_policy(name) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (car_plate) REFERENCES car(plate) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_commute_distance
         FOREIGN KEY (start_city, end_city)
