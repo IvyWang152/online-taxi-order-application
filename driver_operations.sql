@@ -20,6 +20,7 @@ DELIMITER ;
 CALL create_driver('AB6X','admin','unknown','2000-01-01','Malden');
 CALL create_driver('TT0TT','Harry','male','1986-10-13','Hagwarts');
 CALL create_driver('MMB122','Micy','female','2200-11-07','Texas');
+CALL create_driver('ADMIN','test','binary','1990-05-29','Boston');
 
 DELIMITER $$
 CREATE PROCEDURE get_drivers()
@@ -128,38 +129,6 @@ BEGIN
 END $$
 DELIMITER ;
 
--- 5. UPDATE: update order status
-DELIMITER $$
-CREATE PROCEDURE complete_order(order_id INT)
-BEGIN
-	UPDATE ride_order
-    SET order_status = 'completed'
-    WHERE id = order_id;
-END $$
-
-DELIMITER ;
-
-
--- Trigger to update driver availability
-DELIMITER //
-CREATE TRIGGER update_driver_availability
-AFTER UPDATE ON ride_order
-FOR EACH ROW
-BEGIN
-	IF OLD.order_status != NEW.order_status THEN
-    IF NEW.order_status = 'completed' OR NEW.order_status = 'canceled' THEN
-        UPDATE driver 
-        INNER JOIN car ON driver.driver_license = car.driver_license
-        SET is_available = TRUE WHERE car.plate = NEW.car_plate;
-    ELSE
-        UPDATE driver 
-        INNER JOIN car ON driver.driver_license = car.driver_license
-        SET is_available = FALSE WHERE car.plate = NEW.car_plate;
-    END IF;
-    END IF;
-END;
-//
-DELIMITER ;
 
 
 -- 6. UPDATE: update car color and accessibility

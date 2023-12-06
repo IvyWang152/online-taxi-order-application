@@ -148,7 +148,7 @@ DELIMITER ;
 
 -- update order status
 DELIMITER $$
-CREATE PROCEDURE update_order_status(order_id INT, new_status enum('available','completed','canceled','in progress'))
+CREATE PROCEDURE update_order_status(order_id INT, new_status enum('completed','canceled','in progress'))
 BEGIN
 	UPDATE ride_order
     SET order_status = new_status
@@ -163,18 +163,21 @@ CREATE TRIGGER after_order_completion
 AFTER UPDATE ON ride_order
 FOR EACH ROW
 BEGIN
+	IF NEW.order_status = 'in progress' AND OLD.order_status = 'available' THEN
+		UPDATE driver
+        INNER JOIN car ON driver.driver_license = car.driver_license
+        SET is_available = FALSE WHERE car.plate = NEW.car_plate;
+	END IF;
     IF NEW.order_status = 'completed' AND OLD.order_status != 'completed' THEN
         UPDATE car
         SET location = NEW.end_city
         WHERE plate = (SELECT car_plate FROM ride_order WHERE id = NEW.id);
+		UPDATE driver 
+        INNER JOIN car ON driver.driver_license = car.driver_license
+        SET is_available = TRUE WHERE car.plate = NEW.car_plate;
     END IF;
 END $$
-
 DELIMITER ;
-
-
-
-
 
 
 
