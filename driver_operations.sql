@@ -80,7 +80,10 @@ END $$
 
 DELIMITER ;
 
--- CALL create_car('6666',2,4,'red',false,'admin');
+CALL create_car('6666',2,4,'red',false,'admin');
+CALL create_car('I6HW2',1,6,'white',true,'admin');
+CALL create_car('FF01A',2,4,'blue',true,'MMB122');
+CALL create_car('54WHB',3,6,'yellow',false,'TT0TT');
 
 DELIMITER $$
 CREATE PROCEDURE get_car_of_driver(driver_license_p varchar(20))
@@ -113,7 +116,7 @@ DROP PROCEDURE IF EXISTS get_orders;
 DELIMITER $$
 CREATE PROCEDURE get_orders()
 BEGIN
-	SELECT * FROM ride_order WHERE order_status = 'available';
+	SELECT * FROM ride_order;
 END $$
 
 DELIMITER ;

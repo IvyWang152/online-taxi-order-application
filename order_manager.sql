@@ -125,7 +125,7 @@ BEGIN
     FROM car c
     JOIN driver d ON c.driver_license = d.driver_license
     WHERE d.is_available = TRUE
-      AND c.location = start_city_name;
+      AND (c.location = start_city_name OR c.location IS NULL);
 END $$
 
 DELIMITER ;
@@ -178,6 +178,39 @@ DELIMITER $$
 CREATE PROCEDURE view_routes()
 BEGIN
 	SELECT * FROM commute_distance;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE get_order_by_orderId(id_p int)
+begin
+	SELECT * FROM ride_order
+    WHERE id = id_p;
+end $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE get_cars_with_cap_or_access(start_city_name VARCHAR(255), capacity int, accessibility_p bool)
+BEGIN
+    SELECT DISTINCT c.* 
+    FROM car c
+    JOIN driver d ON c.driver_license = d.driver_license
+    WHERE d.is_available = TRUE
+      AND (c.location = start_city_name or c.location is null)
+      AND c.car_capacity = capacity
+      AND c.accessibility = accessibility_p;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE process_order(order_id INT,car_plate_p varchar(20),start_city_p varchar(255))
+BEGIN
+	UPDATE ride_order
+    SET car_plate = car_plate_p,
+    start_city = start_city_p
+    WHERE id = order_id;
+
 END $$
 
 DELIMITER ;

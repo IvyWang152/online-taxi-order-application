@@ -689,7 +689,8 @@ public class CLI {
     } while (!accessibilityInput.equalsIgnoreCase("true") && !accessibilityInput.equalsIgnoreCase("false"));
 
     Order newOrder = new Order(orderDate, desiredCapacity, accessibility, startCity, endCity, accountNumber);
-    passengerDao.createOrder(newOrder);
+    //passengerDao.createOrder(newOrder);
+    orderDao.createOrder(newOrder);
   }
   public void updateOrder() {
     if (!isAuthenticatedPassenger || currentPassenger == null) {

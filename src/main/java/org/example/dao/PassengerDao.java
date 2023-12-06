@@ -113,6 +113,7 @@ public class PassengerDao {
 
       stmt.execute();
       System.out.println("Order created successfully!");
+
     } catch (SQLException e) {
       if (e.getMessage().contains("FOREIGN KEY (`start_city`, `end_city`)")) {
         // Handle duplicate entry

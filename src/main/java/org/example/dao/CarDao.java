@@ -114,7 +114,7 @@ public class CarDao {
 
 
 
-  private Car mapRowToCar(ResultSet rs) throws SQLException {
+  Car mapRowToCar(ResultSet rs) throws SQLException {
     Car car = new Car();
     car.setPlate(rs.getString("plate"));
     car.setCarModelId(rs.getInt("car_model_id"));
