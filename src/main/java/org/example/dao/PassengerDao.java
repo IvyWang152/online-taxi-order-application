@@ -2,6 +2,7 @@ package org.example.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,6 +31,7 @@ public class PassengerDao {
       // Handle or log the error appropriately
     }
   }
+
   public Passenger getPassenger(String accountNumber) {
     // SQL query or stored procedure call to get a passenger by their accountNumber
     String procedureCall = "{CALL get_passenger_by_account_number(?)}";
@@ -48,7 +50,8 @@ public class PassengerDao {
     }
     return null;
   }
-  public Passenger updatePassenger(Passenger passenger){
+
+  public Passenger updatePassenger(Passenger passenger) {
     String procedureCall = "{CALL update_user_profile(?, ?, ?, ?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
@@ -65,16 +68,17 @@ public class PassengerDao {
     return null;
   }
 
-  public void deletePassenger(String accountNumber){
+  public void deletePassenger(String accountNumber) {
     String procedureCall = "{CALL delete_passenger_account(?)}";
     try (Connection conn = DBConnector.getConnection();
-         CallableStatement stmt = conn.prepareCall(procedureCall)){
-      stmt.setString(1,accountNumber);
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+      stmt.setString(1, accountNumber);
       stmt.execute();
-    } catch (SQLException e){
+    } catch (SQLException e) {
       e.printStackTrace();
     }
   }
+
   public List<Passenger> getAllPassengers() throws SQLException {
     List<Passenger> passengers = new ArrayList<>();
     String sql = "SELECT * FROM Passenger";
@@ -99,6 +103,7 @@ public class PassengerDao {
     passenger.setBirthDate(rs.getDate("birth_date"));
     return passenger;
   }
+
   public void createOrder(Order order) {
     String procedureCall = "{CALL create_order(?, ?, ?, ?, ?, ?)}";
     try (Connection conn = DBConnector.getConnection();
@@ -118,14 +123,13 @@ public class PassengerDao {
       if (e.getMessage().contains("FOREIGN KEY (`start_city`, `end_city`)")) {
         // Handle duplicate entry
         System.out.println(
-            String.format("Error: There's no route from %s to %s. Please view existing city routes",
-                order.getStartCity(),order.getEndCity()));
-      }
-      else{
-          System.err.println("Error creating order: " + e.getMessage());
+                String.format("Error: There's no route from %s to %s. Please view existing city routes",
+                        order.getStartCity(), order.getEndCity()));
+      } else {
+        System.err.println("Error creating order: " + e.getMessage());
 
-          throw new RuntimeException("Failed to create order", e);
-        }
+        throw new RuntimeException("Failed to create order", e);
+      }
     }
   }
 
@@ -174,4 +178,19 @@ public class PassengerDao {
   }
 
 
+  public void deleteOrder(int orderId) {
+    String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
+
+    try (Connection conn = DBConnector.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(deleteOrderQuery)) {
+
+      stmt.setInt(1, orderId);
+      stmt.executeUpdate();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+      throw new RuntimeException("Error deleting order: " + e.getMessage());
+    }
+  }
 }

@@ -135,6 +135,7 @@ public class CLI {
         System.out.println("10. log out");
         System.out.println("11. view routes");
         System.out.println("12. Update orders");
+        System.out.println("13. Delete orders");
       }
       try {
         System.out.print("Enter command number: ");
@@ -152,6 +153,7 @@ public class CLI {
           case "3", "exit" -> exit = closingPrompt();
           case "11","view routes"-> showRoutes();
           case "12", "update orders" -> updateOrder(); // New option to update orders
+          case "13", "delete order" -> deleteOrder();
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
       } catch (InputMismatchException e) {
@@ -736,29 +738,24 @@ public class CLI {
     System.out.println("1. Update desired capacity");
     System.out.println("2. Update accessibility");
     System.out.println("3. Update start and end cities");
-    System.out.println("4. Cancel");
+    System.out.println("4. Cancel update");
 
     String updateChoice = scanner.nextLine().trim();
 
     switch (updateChoice) {
-      case "1":
+      case "1" ->
         // Update desired capacity
-        updateOrderCapacity(orderId);
-        break;
-      case "2":
+              updateOrderCapacity(orderId);
+      case "2" ->
         // Update accessibility
-        updateOrderAccessibility(orderId);
-        break;
-      case "3":
+              updateOrderAccessibility(orderId);
+      case "3" ->
         // Update start and end cities
-        updateOrderRoute(orderId);
-        break;
-      case "4":
+              updateOrderRoute(orderId);
+      case "4" ->
         // Cancel the update
-        System.out.println("Update canceled.");
-        break;
-      default:
-        System.out.println("Invalid choice. Please enter a valid option.");
+              System.out.println("Update canceled.");
+      default -> System.out.println("Invalid choice. Please enter a valid option.");
     }
   }
 
@@ -798,6 +795,53 @@ public class CLI {
     orderDao.updateOrderRoute(orderId, newStartCity, newEndCity);
     System.out.println("Start and end cities updated successfully.");
   }
+  public void deleteOrder() {
+    if (!isAuthenticatedPassenger || currentPassenger == null) {
+      System.out.println("Please register or log in first");
+      return;
+    }
+
+    // Display passenger's orders
+    List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    if (orders.isEmpty()) {
+      System.out.println("No orders found for this passenger.");
+      return;
+    } else {
+      System.out.println("Your Orders:");
+      for (Order order : orders) {
+        System.out.println(order.toString());
+      }
+    }
+
+    // Prompt passenger to choose an order to delete
+    System.out.println("Enter the Order ID you want to delete: ");
+    int orderId;
+    try {
+      orderId = Integer.parseInt(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid input. Please enter a valid Order ID.");
+      return;
+    }
+
+    // Check if the provided Order ID exists for the current passenger
+    boolean orderExists = orders.stream().anyMatch(order -> order.getId() == orderId);
+    if (!orderExists) {
+      System.out.println("Invalid Order ID. Please enter a valid Order ID.");
+      return;
+    }
+
+    // Confirm with the user before deleting
+    System.out.println("Are you sure you want to delete this order? (yes/no)");
+    String confirmation = scanner.nextLine().trim().toLowerCase();
+    if (confirmation.equals("yes")) {
+      // Delete the order
+      passengerDao.deleteOrder(orderId);
+      System.out.println("Order deleted successfully.");
+    } else {
+      System.out.println("Deletion canceled.");
+    }
+  }
+
 
 
 }
