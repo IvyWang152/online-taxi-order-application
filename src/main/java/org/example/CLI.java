@@ -25,7 +25,6 @@ public class CLI {
     this.driverDao = new DriverDao();
     this.passengerDao = new PassengerDao();
     this.carDao = new CarDao();
-
   }
 
   public void start() throws Exception {
@@ -46,17 +45,14 @@ public class CLI {
         case "1", "driver" -> {
           showDriverMenu();
           validInput = true;
-          break;
         }
         case "2", "passenger" -> {
           showPassengerMenu();
           validInput = true;
-          break;
         }
         case "3", "exit" -> {
           if (closingPrompt()) {
             validInput = true;
-            break;
           }
         }
         default ->
@@ -92,51 +88,23 @@ public class CLI {
       try {
         System.out.print("Enter command number: ");
         String choice = scanner.nextLine().toLowerCase();
-        switch(choice) {
-          case "1", "register":
-            addNewDriver();
-            break;
-          case "2", "log in":
-            loginDriver();
-            break;
-          case "3", "view profile":
-            showDriverProfile();
-            break;
-          case "4", "update profile":
-            updateDriverProfile();
-            break;
-          case "5", "delete account":
-            deleteDriverAccount();
-            break;
-          case "6", "view all drivers":
-            showAllDrivers();
-            break;
-          case "7","add car":
-            addNewCar();
-            break;
-          case "8","view car":
-            showCar();
-            break;
-          case "9","view car models":
-            showCarModels();
-            break;
-          case "10", "log out":
-            logoutDriver();
-            break;
-          case "11","exit":
-            exit = closingPrompt();
-            break;
-          default:
-            System.out.println("Invalid choice. Please enter a valid value.");
-            break;
+        switch (choice) {
+          case "1", "register" -> addNewDriver();
+          case "2", "log in" -> loginDriver();
+          case "3", "view profile" -> showDriverProfile();
+          case "4", "update profile" -> updateDriverProfile();
+          case "5", "delete account" -> deleteDriverAccount();
+          case "6", "view all drivers" -> showAllDrivers();
+          case "7", "add car" -> addNewCar();
+          case "8", "view car" -> showCar();
+          case "9", "view car models" -> showCarModels();
+          case "10", "log out" -> logoutDriver();
+          case "11", "exit" -> exit = closingPrompt();
+          default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
-//        if(choice=="11" || choice.equalsIgnoreCase("exit")){
-//          exit = closingPrompt();
-//        }
-       // handleDriverOperation(choice);
+
       } catch (InputMismatchException e) {
         System.out.println("Invalid input! Please enter a number.");
-        //scanner.nextLine(); // Consume the invalid input
       }
     }
   }
@@ -176,10 +144,6 @@ public class CLI {
           case "3", "exit" -> exit = closingPrompt();
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
-//        if(choice=="11" || choice.equalsIgnoreCase("exit")){
-//          exit = closingPrompt();
-//        }
-        // handleDriverOperation(choice);
       } catch (InputMismatchException e) {
         System.out.println("Invalid input! Please enter a number.");
         //scanner.nextLine(); // Consume the invalid input
@@ -230,7 +194,7 @@ public class CLI {
       System.out.println("Enter the account_number: ");
       String accountNumber = scanner.nextLine().trim();
 
-      // Validate account number (you can add more validation criteria)
+      // Validate account number
       if (accountNumber.isEmpty()) {
         throw new IllegalArgumentException("Account number cannot be empty");
       }
@@ -238,7 +202,7 @@ public class CLI {
       System.out.println("Enter name: ");
       String name = scanner.nextLine();
 
-      // Validate name (you can add more validation criteria)
+      // Validate name
       if (name.isEmpty()) {
         throw new IllegalArgumentException("Name cannot be empty");
       }
@@ -246,7 +210,7 @@ public class CLI {
       System.out.println("Enter gender ('male', 'female', 'other', or 'custom'): ");
       String gender = scanner.nextLine().toLowerCase();
 
-      // Validate gender (you can add more validation criteria)
+      // Validate gender
       if (!isValidGender(gender)) {
         throw new IllegalArgumentException("Invalid gender. Please enter 'male', 'female', 'other', or 'custom'");
       }
@@ -260,7 +224,7 @@ public class CLI {
       System.out.println("Enter birth date (yy-mm-dd): ");
       String birthDateStr = scanner.nextLine();
 
-      // Validate and parse birth date
+      // Validate and parse birthdate
       java.sql.Date birthDate = null;
       try {
         birthDate = java.sql.Date.valueOf(birthDateStr);
@@ -281,8 +245,6 @@ public class CLI {
     return gender.equals("male") || gender.equals("female") || gender.equals("other") || gender.equals("custom");
   }
 
-
-
   public void loginDriver() {
     System.out.println("Enter your driver's license: ");
     String driverLicense = scanner.nextLine().trim();
@@ -292,7 +254,6 @@ public class CLI {
       return;
     }
     isAuthenticatedDriver = true;
-
 
   }
   public void loginPassenger() {
@@ -305,9 +266,7 @@ public class CLI {
     }
     isAuthenticatedPassenger = true;
 
-
   }
-
 
   public void logoutDriver() {
 
@@ -395,7 +354,7 @@ public class CLI {
       String availability = scanner.nextLine().trim().toLowerCase();
 
       if (availability.equals("true") || availability.equals("false")) {
-        isAvailable = Boolean.valueOf(availability);
+        isAvailable = Boolean.parseBoolean(availability);
         break; // Break out of the loop if input is "true" or "false"
       } else {
         System.out.println("Invalid input. Please enter true or false for accessibility.");
@@ -552,8 +511,6 @@ public class CLI {
   }
   }
 
-
-
   public void showAllDrivers(){
     List<Driver> drivers = driverDao.getAllDrivers();
     if(drivers.isEmpty()){
@@ -575,9 +532,6 @@ public class CLI {
       }
     }
   }
-
-  // Methods to handle input for other operations
-  // e.g., public Driver getNewDriverDetails() {...}
 
   // Method to close the scanner
   public boolean closingPrompt() {
@@ -662,7 +616,6 @@ public class CLI {
       return;
     }
 
-
     System.out.println("Enter pick up location: ");
     String startCity = scanner.nextLine().trim();
     if (startCity.isEmpty()) {
@@ -676,7 +629,6 @@ public class CLI {
       return;
     }
     Order newOrder = new Order(orderDate, desiredCapacity, accessibility, farePolicyName, startCity, endCity, accountNumber);
-
 
     passengerDao.createOrder(currentPassenger, newOrder);
     System.out.println("New order created successfully!");
