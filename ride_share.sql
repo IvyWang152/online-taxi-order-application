@@ -32,7 +32,7 @@ CREATE TABLE car (
     driver_license varchar(20),
     location varchar(255) DEFAULT NULL,
     FOREIGN KEY(car_model_id) REFERENCES car_model(car_model_id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (driver_license) REFERENCES driver(driver_license) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (driver_license) REFERENCES driver(driver_license) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Creating Payment table

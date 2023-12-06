@@ -79,10 +79,10 @@ DELIMITER ;
 -- 8. DELETE: delete passenger and automatically delete their orders (trigger)
 DELIMITER $$
 CREATE PROCEDURE delete_passenger_account(
-	account_number  varchar(20)
+	account_number_p  varchar(20)
 )
 BEGIN
-	DELETE FROM passenger WHERE account_number = account_number;
+	DELETE FROM passenger WHERE account_number = account_number_p;
 END $$
 DELIMITER ;
 
