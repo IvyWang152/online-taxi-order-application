@@ -21,6 +21,9 @@ END $$
 
 DELIMITER ;
 
+CALL create_passenger('1QAZ','admin','male','1993-03-12');
+
+
 -- get passenger by account_number
 DELIMITER $$
 CREATE PROCEDURE get_passenger_by_account_number(account_number_p varchar(20))

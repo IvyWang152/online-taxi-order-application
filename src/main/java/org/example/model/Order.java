@@ -3,24 +3,26 @@ package org.example.model;
 import java.sql.Date;
 
 public class Order {
-  private String startCity;
-  private String endCity;
   private int id;
   private Date orderDate;
+  private String accountNumber;
   private int desiredCapacity;
   private Boolean accessibility;
-  private String farePolicy;
+  private String startCity;
+  private String endCity;
   private int driverReview;
   private int passengerReview;
   private String orderStatus;
-  private String accountNumber;
 
-  public Order(Date orderDate, int desiredCapacity, Boolean accessibility, String farePolicy,
+  private String carPlate;
+  private double fare;
+
+
+  public Order(Date orderDate, int desiredCapacity, Boolean accessibility,
                String startCity, String endCity, String accountNumber) {
     this.orderDate = orderDate;
     this.desiredCapacity = desiredCapacity;
     this.accessibility = accessibility;
-    this.farePolicy = farePolicy;
     this.startCity = startCity;
     this.endCity = endCity;
     this.accountNumber = accountNumber;
@@ -33,6 +35,10 @@ public class Order {
   // Getters and setters for each attribute
   public int getId() {
     return id;
+  }
+
+  public void setId(int id){
+    this.id = id;
   }
   public Date getOrderDate() {
     return orderDate;
@@ -58,10 +64,6 @@ public class Order {
     this.accessibility = accessibility;
   }
 
-  public String getFarePolicy() {
-    return farePolicy;
-  }
-  
 
   public int getDriverReview() {
     return driverReview;
@@ -90,6 +92,7 @@ public class Order {
   public String getAccountNumber() {
     return accountNumber;
   }
+  public void setAccountNumber(String accountNumber) {this.accountNumber = accountNumber;}
 
   public String getStartCity() {
     return startCity;
@@ -99,20 +102,45 @@ public class Order {
     return endCity;
   }
 
-  public void setFarePolicy(String farePolicy) {
-    this.farePolicy = farePolicy;
+  public void setStartCity(String startCity) {
+    this.startCity = startCity;
+  }
+
+  public void setEndCity(String endCity) {
+    this.endCity = endCity;
+  }
+
+  public double getFare() {
+    return fare;
+  }
+
+  public void setFare(double fare) {
+    this.fare = fare;
+  }
+
+  public String getCarPlate() {
+    return carPlate;
+  }
+
+  public void setCarPlate(String carPlate) {
+    this.carPlate = carPlate;
   }
 
   @Override
   public String toString() {
     return "Order{" +
-            "orderDate=" + orderDate +
-            ", desiredCapacity=" + desiredCapacity +
-            ", accessibility='" + accessibility + '\'' +
-            ", fare policy=" + farePolicy +
-            ", driverReview=" + driverReview +
-            ", passengerReview=" + passengerReview +
-            ", orderStatus='" + orderStatus + '\'' +
-            '}';
+        "id=" + id +
+        ", orderDate=" + orderDate +
+        ", accountNumber='" + accountNumber + '\'' +
+        ", desiredCapacity=" + desiredCapacity +
+        ", accessibility=" + accessibility +
+        ", startCity='" + startCity + '\'' +
+        ", endCity='" + endCity + '\'' +
+        ", driverReview=" + driverReview +
+        ", passengerReview=" + passengerReview +
+        ", orderStatus='" + orderStatus + '\'' +
+        ", carPlate='" + carPlate + '\'' +
+        ", fare=" + fare +
+        '}';
   }
 }
