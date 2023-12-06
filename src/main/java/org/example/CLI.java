@@ -171,26 +171,74 @@ public class CLI {
 
   //command line prompts for creating a driver
   public void addNewDriver(){
-    System.out.println("Enter driver license: ");
-    String driverLicense = scanner.nextLine().trim();
+//    System.out.println("Enter driver license: ");
+//    String driverLicense = scanner.nextLine().trim();
+//    if (driverLicense.isEmpty()) {
+//      throw new IllegalArgumentException("Driver license cannot be empty");
+//    }
+    String driverLicense;
+    while (true) {
+      System.out.println("Enter driver license: ");
+      driverLicense = scanner.nextLine().trim();
+     if (!driverLicense.isEmpty()){
+       break;
+     } else {
+       System.out.println("Driver license cannot be empty");
+     }
+    }
 
-    System.out.println("Enter name: ");
-    String name = scanner.nextLine();
+    String name;
+    while (true) {
+      System.out.println("Enter name: ");
+      name = scanner.nextLine().trim();
+      if (!name.isEmpty()){
+        break;
+      } else {
+        System.out.println("Name cannot be empty");
+      }
+    }
 
-    System.out.println("Enter gender: ");
-    String gender = scanner.nextLine();
+    String gender;
+    while (true) {
+      System.out.println("Enter gender: ");
+      gender = scanner.nextLine().trim();
+      if (!gender.isEmpty()){
+        break;
+      } else {
+        System.out.println("Gender cannot be empty");
+      }
+    }
+    String tmp;
+    java.sql.Date birthDate;
+    while (true) {
+      System.out.println("Edit birth date (yy-mm-dd):");
+      tmp = scanner.nextLine().trim();
+      if (!tmp.isEmpty()){
+        try {
+          birthDate = java.sql.Date.valueOf(tmp);
+          break;
+        } catch (IllegalArgumentException e) {
+          System.out.println("Invalid date format. Please use yy-mm-dd format.");
+        }
+      } else {
+        System.out.println("Birthdate cannot be empty");
+      }
+    }
+    String address;
+    while (true) {
+      System.out.println("Enter address: ");
+      address = scanner.nextLine().trim();
+      if (!address.isEmpty()){
+        break;
+      } else {
+        System.out.println("Address cannot be empty");
+      }
+    }
 
-    System.out.println("Enter birth date (yy-mm-dd): ");
-    String birth_date = scanner.nextLine();
-    java.sql.Date birthDate = java.sql.Date.valueOf(birth_date);
-
-    System.out.println("Enter address: ");
-    String address = scanner.nextLine();
 
     Driver newDriver = new Driver(driverLicense,name,gender,birthDate,address);
     try {
       driverDao.addDriver(newDriver);
-      System.out.println("New driver created successfully!");
     } catch (Exception e) {
       System.out.println("Error creating driver: " + e.getMessage());
     }
