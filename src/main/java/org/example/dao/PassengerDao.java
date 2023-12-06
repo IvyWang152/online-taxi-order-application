@@ -99,8 +99,8 @@ public class PassengerDao {
     passenger.setBirthDate(rs.getDate("birth_date"));
     return passenger;
   }
-  public void createOrder(Passenger passenger, Order order) {
-    String procedureCall = "{CALL create_order(?, ?, ?, ?, ?, ?, ?)}";
+  public void createOrder(Order order) {
+    String procedureCall = "{CALL create_order(?, ?, ?, ?, ?, ?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
 
@@ -108,16 +108,23 @@ public class PassengerDao {
       stmt.setInt(2, order.getDesiredCapacity());
       stmt.setBoolean(3, order.getAccessibility());
       stmt.setString(4, order.getAccountNumber());
-      stmt.setString(5, order.getFarePolicy());
-      stmt.setString(6, order.getStartCity());
-      stmt.setString(7, order.getEndCity());
+      stmt.setString(5, order.getStartCity());
+      stmt.setString(6, order.getEndCity());
 
       stmt.execute();
       System.out.println("Order created successfully!");
     } catch (SQLException e) {
-      System.err.println("Error creating order: " + e.getMessage());
+      if (e.getMessage().contains("FOREIGN KEY (`start_city`, `end_city`)")) {
+        // Handle duplicate entry
+        System.out.println(
+            String.format("Error: There's no route from %s to %s. Please view existing city routes",
+                order.getStartCity(),order.getEndCity()));
+      }
+      else{
+          System.err.println("Error creating order: " + e.getMessage());
 
-      throw new RuntimeException("Failed to create order", e);
+          throw new RuntimeException("Failed to create order", e);
+        }
     }
   }
 
@@ -146,15 +153,21 @@ public class PassengerDao {
 
   private Order mapRowToOrder(ResultSet rs) throws SQLException {
     Order order = new Order();
+    order.setId(rs.getInt("id"));
     order.setOrderDate(rs.getDate("order_date"));
+    order.setAccountNumber(rs.getString("account_number"));
     order.setDesiredCapacity(rs.getInt("desired_capacity"));
     order.setAccessibility(rs.getBoolean("accessibility"));
+    order.setStartCity(rs.getString("start_city"));
+    order.setEndCity(rs.getString("end_city"));
+    order.setCarPlate(rs.getString("car_plate"));
+
 
     // Set other attributes of the Order class based on your model
-    order.setFarePolicy(rs.getString("fare_column_name"));
-    order.setDriverReview(rs.getInt("driver_review_column_name"));
-    order.setPassengerReview(rs.getInt("passenger_review_column_name"));
-    order.setOrderStatus(rs.getString("order_status_column_name"));
+    order.setDriverReview(rs.getInt("driver_review"));
+    order.setPassengerReview(rs.getInt("passenger_review"));
+    order.setOrderStatus(rs.getString("order_status"));
+    order.setFare(rs.getDouble("fare"));
 
     return order;
   }

@@ -1,5 +1,6 @@
 package org.example;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.sql.SQLException;
@@ -7,9 +8,11 @@ import java.util.List;
 import java.util.Scanner;
 import org.example.dao.CarDao;
 import org.example.dao.DriverDao;
+import org.example.dao.OrderDao;
 import org.example.dao.PassengerDao;
 import org.example.model.Car;
 import org.example.model.CarModel;
+import org.example.model.CommuteDistance;
 import org.example.model.Driver;
 import org.example.model.Order;
 import org.example.model.Passenger;
@@ -19,12 +22,15 @@ public class CLI {
   private final DriverDao driverDao;
   private final PassengerDao passengerDao;
   private final CarDao carDao;
+  private final OrderDao orderDao;
 
   public CLI() {
     this.scanner = new Scanner(System.in);
     this.driverDao = new DriverDao();
     this.passengerDao = new PassengerDao();
     this.carDao = new CarDao();
+    this.orderDao = new OrderDao();
+
   }
 
   public void start() throws Exception {
@@ -127,6 +133,7 @@ public class CLI {
         System.out.println("8. View your orders!");
         System.out.println("9. Create an order.");
         System.out.println("10. log out");
+        System.out.println("11. view routes");
       }
       try {
         System.out.print("Enter command number: ");
@@ -142,6 +149,7 @@ public class CLI {
           case "9", "create an order" -> createOrder();
           case "10", "log out" -> logoutPassenger();
           case "3", "exit" -> exit = closingPrompt();
+          case "11","view routes"-> showRoutes();
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
       } catch (InputMismatchException e) {
@@ -567,6 +575,17 @@ public class CLI {
     }
   }
 
+  public void showRoutes(){
+    if (!isAuthenticatedPassenger || currentPassenger == null) {
+      System.out.println("Please register or log in first");
+      return;
+    }
+    List<CommuteDistance> res = orderDao.viewRoutes();
+    for(CommuteDistance each: res){
+      System.out.println(each.toString());
+    }
+  }
+
   public void createOrder() {
     if (!isAuthenticatedPassenger || currentPassenger == null) {
       System.out.println("Please log in first");
@@ -577,15 +596,19 @@ public class CLI {
       }
     }
     String accountNumber = currentPassenger.getAccountNumber();
+    LocalDate currentDate = LocalDate.now(); // This gets the current date
+    java.sql.Date orderDate = java.sql.Date.valueOf(currentDate); // Convert to sql.Date
 
-    System.out.println("Enter order date (yy-mm-dd): ");
-    String orderDateStr = scanner.nextLine().trim();
-
-    java.sql.Date orderDate;
-    try {
-      orderDate = java.sql.Date.valueOf(orderDateStr);
-    } catch (IllegalArgumentException e) {
-      System.out.println("Invalid date format. Please use 'yy-mm-dd'");
+    System.out.println("Enter start city: ");
+    String startCity = scanner.nextLine().trim();
+    if (startCity.isEmpty()) {
+      System.out.println("Pick up name cannot be empty. Please enter a valid name.");
+      return;
+    }
+    System.out.println("Enter drop off city: ");
+    String endCity = scanner.nextLine().trim();
+    if (endCity.isEmpty()) {
+      System.out.println("Drop off name cannot be empty. Please enter a valid name.");
       return;
     }
 
@@ -608,30 +631,10 @@ public class CLI {
       return;
     }
 
-    System.out.println("Enter fare policy name: ");
-    String farePolicyName = scanner.nextLine().trim();
+    Order newOrder = new Order(orderDate, desiredCapacity, accessibility, startCity, endCity, accountNumber);
 
-    if (farePolicyName.isEmpty()) {
-      System.out.println("Fare policy name cannot be empty. Please enter a valid name.");
-      return;
-    }
+    passengerDao.createOrder(newOrder);
 
-    System.out.println("Enter pick up location: ");
-    String startCity = scanner.nextLine().trim();
-    if (startCity.isEmpty()) {
-      System.out.println("Pick up name cannot be empty. Please enter a valid name.");
-      return;
-    }
-    System.out.println("Enter drop off location: ");
-    String endCity = scanner.nextLine().trim();
-    if (endCity.isEmpty()) {
-      System.out.println("Drop off name cannot be empty. Please enter a valid name.");
-      return;
-    }
-    Order newOrder = new Order(orderDate, desiredCapacity, accessibility, farePolicyName, startCity, endCity, accountNumber);
-
-    passengerDao.createOrder(currentPassenger, newOrder);
-    System.out.println("New order created successfully!");
   }
 
 }

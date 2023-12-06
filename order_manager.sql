@@ -11,31 +11,26 @@ CREATE PROCEDURE create_order(
     desired_capacity int,
     accessibility bool,
     account_number varchar(20),
-    fare_policy_name varchar(255),
     start_city varchar(255),
     end_city varchar(255)
 )
 BEGIN
-DECLARE account_exists INT;
-    DECLARE fare_policy_exists INT;
+	DECLARE account_exists INT;
     DECLARE commute_route_exists INT;
 
     SELECT COUNT(*) INTO account_exists FROM passenger WHERE account_number = account_number;
-    SELECT COUNT(*) INTO fare_policy_exists FROM fare_policy WHERE name = fare_policy_name;
     SELECT COUNT(*) INTO commute_route_exists FROM commute_distance WHERE start_city = start_city AND end_city = end_city;
 
     IF account_exists = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account number.';
-    ELSEIF fare_policy_exists = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid fare policy name.';
     ELSEIF commute_route_exists = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid commute route.';
     ELSE
-        INSERT INTO ride_order(order_date, desired_capacity, accessibility, account_number, fare_policy_name, start_city, end_city) 
-        VALUES (order_date, desired_capacity, accessibility, account_number, fare_policy_name, start_city, end_city);
+        INSERT INTO ride_order(order_date, desired_capacity, accessibility, account_number, start_city, end_city) 
+        VALUES (order_date, desired_capacity, accessibility, account_number, start_city, end_city);
     END IF;
 END $$
-DELIMITER ;ride_order
+DELIMITER ;
 
 -- update/edit order
 -- edit capacity
@@ -179,7 +174,13 @@ BEGIN
 END $$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE view_routes()
+BEGIN
+	SELECT * FROM commute_distance;
+END $$
 
+DELIMITER ;
 
 
 

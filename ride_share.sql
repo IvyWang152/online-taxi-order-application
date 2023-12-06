@@ -49,6 +49,11 @@ CREATE TABLE commute_distance(
     PRIMARY KEY (start_city, end_city)
 );
 
+INSERT INTO commute_distance(start_city,end_city,distance) VALUES ('Boston','Worcester',47);
+INSERT INTO commute_distance(start_city,end_city,distance) VALUES ('Boston','Cambridge',3);
+INSERT INTO commute_distance(start_city,end_city,distance) VALUES ('Newton','Boston',10);
+INSERT INTO commute_distance(start_city,end_city,distance) VALUES ('NewYork','Boston',190);
+
 -- Creating Passenger table
 CREATE TABLE passenger (
     account_number VARCHAR(20) PRIMARY KEY,
