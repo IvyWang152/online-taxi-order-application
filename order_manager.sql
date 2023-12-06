@@ -143,7 +143,7 @@ DELIMITER ;
 
 -- update order status
 DELIMITER $$
-CREATE PROCEDURE update_order_status(order_id INT, new_status enum('completed','canceled','in progress'))
+CREATE PROCEDURE update_order_status(order_id INT, new_status varchar(20))
 BEGIN
 	UPDATE ride_order
     SET order_status = new_status
@@ -159,6 +159,9 @@ AFTER UPDATE ON ride_order
 FOR EACH ROW
 BEGIN
 	IF NEW.order_status = 'in progress' AND OLD.order_status = 'available' THEN
+		UPDATE car
+        SET location = NEW.start_city
+        WHERE plate = (SELECT car_plate FROM ride_order WHERE id = NEW.id);
 		UPDATE driver
         INNER JOIN car ON driver.driver_license = car.driver_license
         SET is_available = FALSE WHERE car.plate = NEW.car_plate;
@@ -211,6 +214,25 @@ BEGIN
     start_city = start_city_p
     WHERE id = order_id;
 
+END $$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE FUNCTION get_latest_order_id(account_number VARCHAR(20))
+RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE latest_order_id INT DEFAULT 0;
+
+    SELECT id INTO latest_order_id 
+    FROM ride_order 
+    WHERE account_number = account_number 
+    ORDER BY order_date DESC, id DESC
+    LIMIT 1;
+
+    RETURN latest_order_id;
 END $$
 
 DELIMITER ;

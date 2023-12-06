@@ -24,7 +24,7 @@ public class OrderDao {
       System.out.println("Sorry, the order is canceled.");
       return;
     }
-    List<Car> matchedCars = showCustomizedCars(startCity,order.getDesiredCapacity(),
+    List<Car> matchedCars = showMatchedCars(startCity,order.getDesiredCapacity(),
         order.getAccessibility());
     if (matchedCars.size()==0){
       System.out.println("No matched cars for desired capacity or accessibility.");
@@ -44,7 +44,7 @@ public class OrderDao {
       stmt.setInt(1, orderId);
       stmt.setString(2,carPlate);
       stmt.setString(3,startCity);
-      stmt.executeQuery();
+      stmt.execute();
     } catch (SQLException e) {
       e.printStackTrace();
       // Handle or log the error appropriately
@@ -80,13 +80,13 @@ public class OrderDao {
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
       stmt.setInt(1, orderId);
       stmt.setString(2, newStatus);
-      stmt.executeQuery();
+      stmt.execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
 
-  public List<Car> showCustomizedCars(String startCity, int capacity, boolean accessibility){
+  public List<Car> showMatchedCars(String startCity, int capacity, boolean accessibility){
     List<Car> cars = new ArrayList<>();
     String procedureCall = "{CALL get_cars_with_cap_or_access(?,?,?)}";
     try (Connection conn = DBConnector.getConnection();
@@ -161,6 +161,7 @@ public class OrderDao {
     Order order = new Order();
     order.setId(rs.getInt("id"));
     order.setOrderDate(rs.getDate("order_date"));
+    order.setAccountNumber(rs.getString("account_number"));
     order.setDesiredCapacity(rs.getInt("desired_capacity"));
     order.setAccessibility(rs.getBoolean("accessibility"));
     order.setStartCity(rs.getString("start_city"));
@@ -229,6 +230,7 @@ public class OrderDao {
 
       stmt.execute();
       //System.out.println("Order created successfully!");
+      order.setId(getLatestOrderId(order.getAccountNumber()));
       orderManager(order);
 
     } catch (SQLException e) {
@@ -245,6 +247,25 @@ public class OrderDao {
       }
     }
   }
+
+  public int getLatestOrderId(String accountNumber) {
+    int latestOrderId = 0;
+    String query = "SELECT get_latest_order_id(?)";
+
+    try (Connection conn = DBConnector.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(query)) {
+      pstmt.setString(1, accountNumber);
+      try (ResultSet rs = pstmt.executeQuery()) {
+        if (rs.next()) {
+          latestOrderId = rs.getInt(1);
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return latestOrderId;
+  }
+
 
   public List<Order> getOrdersForPassenger(String accountNumber) {
     List<Order> orders = new ArrayList<>();

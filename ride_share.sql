@@ -82,7 +82,7 @@ CREATE TABLE ride_order (
     fare DECIMAL(10, 2) DEFAULT 0,
     driver_review INT DEFAULT 0,
     passenger_review INT DEFAULT 0,
-    order_status ENUM('available', 'completed', 'canceled', 'in progress') DEFAULT 'available',
+    order_status varchar(20) DEFAULT 'available',
     account_number VARCHAR(20),
     car_plate VARCHAR(20) DEFAULT NULL,
     start_city VARCHAR(255),
