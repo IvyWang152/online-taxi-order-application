@@ -131,7 +131,7 @@ public class CLI {
         System.out.println("6. Delete account");
         System.out.println("7. View all passengers");
         System.out.println("8. View your orders!");
-        System.out.println("9. Create an order.");
+        System.out.println("9. Create an order (Please check the available routes first (11. view routes)");
         System.out.println("10. log out");
         System.out.println("11. view routes");
       }
