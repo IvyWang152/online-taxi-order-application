@@ -29,9 +29,15 @@ public class DriverDao {
       stmt.setString(5, driver.getAddress());
 
       stmt.execute();
+      System.out.println("Driver created successfully!");
     } catch (SQLException e) {
-      e.printStackTrace();
-      // Handle or log the error appropriately
+      if (e.getErrorCode() == 1062) { // MySQL error code for duplicate entry
+        System.out.println("Driver license '" + driver.getDriverLicense()
+            + "' is already used by an existing member.");
+      } else {
+        e.printStackTrace();
+        // Handle or log the error appropriately
+      }
     }
   }
 
