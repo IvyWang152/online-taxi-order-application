@@ -22,6 +22,7 @@ CREATE TABLE driver (
     is_available BOOLEAN DEFAULT TRUE
 );
 
+
 -- Creating Car table
 CREATE TABLE car (
 	plate VARCHAR(20) PRIMARY KEY,

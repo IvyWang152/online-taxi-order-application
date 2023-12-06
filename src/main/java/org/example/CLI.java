@@ -406,7 +406,9 @@ public class CLI {
     while (true) {
       System.out.println("Edit availability (true or false): (Press Enter to skip)");
       String availability = scanner.nextLine().trim().toLowerCase();
-
+      if(availability.isEmpty()){
+        break;
+      }
       if (availability.equals("true") || availability.equals("false")) {
         isAvailable = Boolean.parseBoolean(availability);
         break; // Break out of the loop if input is "true" or "false"
@@ -416,7 +418,6 @@ public class CLI {
     }
 
     currentDriver = driverDao.updateDriver(new Driver(driverLicense,name,gender,birthDate,address,isAvailable));
-    System.out.println("Update driver profile successfully!");
     System.out.println(currentDriver.toString());
   }
 
