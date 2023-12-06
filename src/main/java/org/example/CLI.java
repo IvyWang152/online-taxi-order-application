@@ -11,6 +11,7 @@ import org.example.dao.PassengerDao;
 import org.example.model.Car;
 import org.example.model.CarModel;
 import org.example.model.Driver;
+import org.example.model.Order;
 import org.example.model.Passenger;
 
 public class CLI {
@@ -147,47 +148,33 @@ public class CLI {
     while (!exit) {
       System.out.println("***** Welcome to Passenger Dashboard! *****");
       if(!isAuthenticatedPassenger) {
-        System.out.println("1. register");
+        System.out.println("1. Register");
         System.out.println("2. log in");
-        System.out.println("11. exit");
+        System.out.println("3. Exit");
       } else{
-        System.out.println("3. view profile");
-        System.out.println("4. update profile");
-        System.out.println("5. delete account");
-        System.out.println("6. view all passengers");
+        System.out.println("4. View profile");
+        System.out.println("5. Update profile");
+        System.out.println("6. Delete account");
+        System.out.println("7. View all passengers");
+        System.out.println("8. View your orders!");
+        System.out.println("9. Create an order.");
         System.out.println("10. log out");
       }
       try {
         System.out.print("Enter command number: ");
         String choice = scanner.nextLine().toLowerCase();
-        switch(choice) {
-          case "1", "register":
-            addNewPassenger();
-            break;
-          case "2", "log in":
-            loginPassenger();
-            break;
-          case "3", "view profile":
-            showPassengerProfile();
-            break;
-          case "4", "update profile":
-            updatePassengerProfile();
-            break;
-          case "5", "delete account":
-            deletePassengerAccount();
-            break;
-          case "6", "view all passengers":
-            showAllPassengers();
-            break;
-          case "10", "log out":
-            logoutPassenger();
-            break;
-          case "11","exit":
-            exit = closingPrompt();
-            break;
-          default:
-            System.out.println("Invalid choice. Please enter a valid value.");
-            break;
+        switch (choice) {
+          case "1", "register" -> addNewPassenger();
+          case "2", "log in" -> loginPassenger();
+          case "4", "view profile" -> showPassengerProfile();
+          case "5", "update profile" -> updatePassengerProfile();
+          case "6", "delete account" -> deletePassengerAccount();
+          case "7", "view all passengers" -> showAllPassengers();
+          case "8", "view your orders" -> viewOrders();
+          case "9", "create an order" -> createOrder();
+          case "10", "log out" -> logoutPassenger();
+          case "3", "exit" -> exit = closingPrompt();
+          default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
 //        if(choice=="11" || choice.equalsIgnoreCase("exit")){
 //          exit = closingPrompt();
@@ -238,28 +225,62 @@ public class CLI {
   }
 
   //command line prompts for creating a passenger
-  public void addNewPassenger(){
-    System.out.println("Enter the account_number: ");
-    String accountNumber = scanner.nextLine().trim();
-
-    System.out.println("Enter name: ");
-    String name = scanner.nextLine();
-
-    System.out.println("Enter gender: ");
-    String gender = scanner.nextLine();
-
-    System.out.println("Enter birth date (yy-mm-dd): ");
-    String birth_date = scanner.nextLine();
-    java.sql.Date birthDate = java.sql.Date.valueOf(birth_date);
-
-    Passenger newPassenger = new Passenger(accountNumber,name,gender,birthDate);
+  public void addNewPassenger() {
     try {
+      System.out.println("Enter the account_number: ");
+      String accountNumber = scanner.nextLine().trim();
+
+      // Validate account number (you can add more validation criteria)
+      if (accountNumber.isEmpty()) {
+        throw new IllegalArgumentException("Account number cannot be empty");
+      }
+
+      System.out.println("Enter name: ");
+      String name = scanner.nextLine();
+
+      // Validate name (you can add more validation criteria)
+      if (name.isEmpty()) {
+        throw new IllegalArgumentException("Name cannot be empty");
+      }
+
+      System.out.println("Enter gender ('male', 'female', 'other', or 'custom'): ");
+      String gender = scanner.nextLine().toLowerCase();
+
+      // Validate gender (you can add more validation criteria)
+      if (!isValidGender(gender)) {
+        throw new IllegalArgumentException("Invalid gender. Please enter 'male', 'female', 'other', or 'custom'");
+      }
+
+      // If custom gender is chosen, allow the user to input their own value
+      if (gender.equals("custom")) {
+        System.out.println("Enter custom gender: ");
+        gender = scanner.nextLine();
+      }
+
+      System.out.println("Enter birth date (yy-mm-dd): ");
+      String birthDateStr = scanner.nextLine();
+
+      // Validate and parse birth date
+      java.sql.Date birthDate = null;
+      try {
+        birthDate = java.sql.Date.valueOf(birthDateStr);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException("Invalid date format. Please use 'yy-mm-dd'");
+      }
+
+      Passenger newPassenger = new Passenger(accountNumber, name, gender, birthDate);
       passengerDao.addPassenger(newPassenger);
       System.out.println("New passenger created successfully!");
     } catch (Exception e) {
       System.out.println("Error creating passenger: " + e.getMessage());
     }
   }
+
+  private boolean isValidGender(String gender) {
+    // Add more accepted gender values as needed
+    return gender.equals("male") || gender.equals("female") || gender.equals("other") || gender.equals("custom");
+  }
+
 
 
   public void loginDriver() {
@@ -575,6 +596,90 @@ public class CLI {
     }
 
     return res.equals(yesOption);
+  }
+  public void viewOrders() {
+    if (!isAuthenticatedPassenger || currentPassenger == null) {
+      System.out.println("Please register or log in first");
+      return;
+    }
+
+    List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
+    if (orders.isEmpty()) {
+      System.out.println("No orders found for this passenger.");
+    } else {
+      for (Order order : orders) {
+        System.out.println(order.toString());
+      }
+    }
+  }
+
+  public void createOrder() {
+    if (!isAuthenticatedPassenger || currentPassenger == null) {
+      System.out.println("Please log in first");
+      loginPassenger(); // Prompt the user to log in
+      if (currentPassenger == null) {
+        System.out.println("Login failed. Aborting order creation.");
+        return;
+      }
+    }
+    String accountNumber = currentPassenger.getAccountNumber();
+
+    System.out.println("Enter order date (yy-mm-dd): ");
+    String orderDateStr = scanner.nextLine().trim();
+
+    java.sql.Date orderDate;
+    try {
+      orderDate = java.sql.Date.valueOf(orderDateStr);
+    } catch (IllegalArgumentException e) {
+      System.out.println("Invalid date format. Please use 'yy-mm-dd'");
+      return;
+    }
+
+    System.out.println("Enter desired capacity: ");
+    int desiredCapacity;
+    try {
+      desiredCapacity = Integer.parseInt(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid input. Please enter an integer for desired capacity.");
+      return;
+    }
+
+    System.out.println("Enter accessibility (true or false): ");
+    boolean accessibility;
+    String accessibilityInput = scanner.nextLine().trim().toLowerCase();
+    if (accessibilityInput.equals("true") || accessibilityInput.equals("false")) {
+      accessibility = Boolean.parseBoolean(accessibilityInput);
+    } else {
+      System.out.println("Invalid input. Please enter true or false for accessibility.");
+      return;
+    }
+
+    System.out.println("Enter fare policy name: ");
+    String farePolicyName = scanner.nextLine().trim();
+
+    if (farePolicyName.isEmpty()) {
+      System.out.println("Fare policy name cannot be empty. Please enter a valid name.");
+      return;
+    }
+
+
+    System.out.println("Enter pick up location: ");
+    String startCity = scanner.nextLine().trim();
+    if (startCity.isEmpty()) {
+      System.out.println("Pick up name cannot be empty. Please enter a valid name.");
+      return;
+    }
+    System.out.println("Enter drop off location: ");
+    String endCity = scanner.nextLine().trim();
+    if (endCity.isEmpty()) {
+      System.out.println("Drop off name cannot be empty. Please enter a valid name.");
+      return;
+    }
+    Order newOrder = new Order(orderDate, desiredCapacity, accessibility, farePolicyName, startCity, endCity, accountNumber);
+
+
+    passengerDao.createOrder(currentPassenger, newOrder);
+    System.out.println("New order created successfully!");
   }
 
 }

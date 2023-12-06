@@ -22,7 +22,7 @@ DECLARE account_exists INT;
 
     SELECT COUNT(*) INTO account_exists FROM passenger WHERE account_number = account_number;
     SELECT COUNT(*) INTO fare_policy_exists FROM fare_policy WHERE name = fare_policy_name;
-    SELECT COUNT(*) INTO commute_route_exists FROM commute_distance WHERE start_city = start_city_p AND end_city = end_city_p;
+    SELECT COUNT(*) INTO commute_route_exists FROM commute_distance WHERE start_city = start_city AND end_city = end_city;
 
     IF account_exists = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid account number.';
@@ -35,7 +35,7 @@ DECLARE account_exists INT;
         VALUES (order_date, desired_capacity, accessibility, account_number, fare_policy_name, start_city, end_city);
     END IF;
 END $$
-DELIMITER ;
+DELIMITER ;ride_order
 
 -- update/edit order
 -- edit capacity

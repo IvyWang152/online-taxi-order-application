@@ -25,10 +25,10 @@ DELIMITER $$
 DELIMITER ;
 -- get passenger by account_number
 DELIMITER $$
-CREATE PROCEDURE get_passeger_by_account_number(account_number varchar(20))
+CREATE PROCEDURE get_passenger_by_account_number(account_number_p varchar(20))
 BEGIN
 	SELECT * from passenger
-    where account_number = account_number;
+    where account_number = account_number_p;
 END $$
 DELIMITER ;
 
@@ -39,43 +39,21 @@ CREATE PROCEDURE read_available_cars()
 BEGIN
     SELECT
         car.plate,
-        car_model.model,
-        car_model.make,
+        car.car_model_id,
         car.car_capacity,
         car.color,
         car.accessibility,
-        driver.name AS driver_name,
-        location.latitude AS current_latitude,
-        location.longitude AS current_longitude
+        car.location,
+        driver.name AS driver_name
     FROM
         car
     JOIN car_model ON car.car_model_id = car_model.car_model_id
     JOIN driver ON car.driver_license = driver.driver_license
-    JOIN location ON driver.address = location.location_id
     WHERE
         car.is_available = TRUE;
 END //
 
-DELIMITER ;
-
 DELIMITER //
-
--- CREATE: create ride order
-CREATE PROCEDURE create_ride_order(
-    IN passenger_account_number VARCHAR(20),
-    IN pickup_location_id INT,
-    IN car_plate VARCHAR(20),
-    IN distance_traveled DECIMAL(10, 2)
-)
-BEGIN
-    INSERT INTO ride_order(passenger_account_number, pickup_location, car_plate, distance_traveled)
-    VALUES (passenger_account_number, pickup_location_id, car_plate, distance_traveled);
-END //
-
-DELIMITER ;
-
-DELIMITER //
-
 -- UPDATE: update order(eg: location, car choice)
 CREATE PROCEDURE update_ride_order(
     IN order_id INT,
@@ -151,6 +129,16 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE get_orders_for_passenger(IN account_number_p VARCHAR(255))
+BEGIN
+    SELECT *
+    FROM ride_order
+    WHERE account_number = account_number_p;
+END //
+DELIMITER ;
+
 
 
 

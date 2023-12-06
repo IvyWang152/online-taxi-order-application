@@ -2,14 +2,13 @@ package org.example.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import org.example.DBConnector;
-import org.example.model.Driver;
+import org.example.model.Order;
 import org.example.model.Passenger;
 
 public class PassengerDao {
@@ -78,7 +77,7 @@ public class PassengerDao {
   }
   public List<Passenger> getAllPassengers() throws SQLException {
     List<Passenger> passengers = new ArrayList<>();
-    String sql = "SELECT * FROM Passenger"; // Adjusted to retrieve all passenger details
+    String sql = "SELECT * FROM Passenger";
 
     try (Connection conn = DBConnector.getConnection();
          Statement stmt = conn.createStatement();
@@ -100,6 +99,65 @@ public class PassengerDao {
     passenger.setBirthDate(rs.getDate("birth_date"));
     return passenger;
   }
+  public void createOrder(Passenger passenger, Order order) {
+    String procedureCall = "{CALL create_order(?, ?, ?, ?, ?, ?, ?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
 
-  // Additional methods for update and delete operations
+      stmt.setDate(1, new java.sql.Date(order.getOrderDate().getTime()));
+      stmt.setInt(2, order.getDesiredCapacity());
+      stmt.setBoolean(3, order.getAccessibility());
+      stmt.setString(4, order.getAccountNumber());
+      stmt.setString(5, order.getPolicyName());
+      stmt.setString(6, order.getStartCity());
+      stmt.setString(7, order.getEndCity());
+
+      stmt.execute();
+      System.out.println("Order created successfully!");
+    } catch (SQLException e) {
+      System.err.println("Error creating order: " + e.getMessage());
+
+      throw new RuntimeException("Failed to create order", e);
+    }
+  }
+
+  public List<Order> getOrdersForPassenger(String accountNumber) {
+    List<Order> orders = new ArrayList<>();
+    String procedureCall = "{CALL get_orders_for_passenger(?)}";
+
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+
+      stmt.setString(1, accountNumber);
+
+      try (ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+          Order order = mapRowToOrder(rs);
+          orders.add(order);
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+    }
+
+    return orders;
+  }
+
+  private Order mapRowToOrder(ResultSet rs) throws SQLException {
+    Order order = new Order();
+    order.setOrderDate(rs.getDate("order_date"));
+    order.setDesiredCapacity(rs.getInt("desired_capacity"));
+    order.setAccessibility(rs.getBoolean("accessibility"));
+
+    // Set other attributes of the Order class based on your model
+    order.setFarePolicy(rs.getString("fare_column_name"));
+    order.setDriverReview(rs.getInt("driver_review_column_name"));
+    order.setPassengerReview(rs.getInt("passenger_review_column_name"));
+    order.setOrderStatus(rs.getString("order_status_column_name"));
+
+    return order;
+  }
+
+
 }
