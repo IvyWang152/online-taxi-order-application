@@ -108,7 +108,7 @@ public class PassengerDao {
       stmt.setInt(2, order.getDesiredCapacity());
       stmt.setBoolean(3, order.getAccessibility());
       stmt.setString(4, order.getAccountNumber());
-      stmt.setString(5, order.getPolicyName());
+      stmt.setString(5, order.getFarePolicy());
       stmt.setString(6, order.getStartCity());
       stmt.setString(7, order.getEndCity());
 

@@ -13,7 +13,6 @@ public class Order {
   private int driverReview;
   private int passengerReview;
   private String orderStatus;
-  private String policyName;
   private String accountNumber;
 
   public Order(Date orderDate, int desiredCapacity, Boolean accessibility, String farePolicy,
@@ -30,7 +29,6 @@ public class Order {
   public Order() {
 
   }
-
 
   // Getters and setters for each attribute
   public int getId() {
@@ -91,10 +89,6 @@ public class Order {
 
   public String getAccountNumber() {
     return accountNumber;
-  }
-
-  public String getPolicyName() {
-    return policyName;
   }
 
   public String getStartCity() {
