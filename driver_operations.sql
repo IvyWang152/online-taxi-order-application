@@ -57,11 +57,11 @@ BEGIN
 END $$
 DELIMITER ;
 
-CALL add_Car_model("Toyota","Corona");
-CALL add_Car_model("Nissan","ARIYA");
-CALL add_Car_model("Volvo","XC90");
-CALL add_Car_model("Honda","Accord");
-CALL add_Car_model("Lexus","LS");
+CALL add_Car_model("Corolla","Toyota");
+CALL add_Car_model("ARIYA","Nissan");
+CALL add_Car_model("XC90","Volvo");
+CALL add_Car_model("Accord","Honda");
+CALL add_Car_model("LS","Lexus");
 
 -- 2. CREATE: create a car
 DELIMITER $$
