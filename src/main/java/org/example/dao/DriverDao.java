@@ -71,6 +71,7 @@ public class DriverDao {
       stmt.setString(5, driver.getAddress());
       stmt.setBoolean(6,driver.getAvailable());
       stmt.execute();
+      System.out.println("Update driver profile successfully!");
       return getDriver(driver.getDriverLicense());
     } catch (SQLException e) {
       e.printStackTrace();
