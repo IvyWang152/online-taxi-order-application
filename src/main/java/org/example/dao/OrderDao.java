@@ -15,7 +15,8 @@ import org.example.model.CommuteDistance;
 import org.example.model.Order;
 
 public class OrderDao {
-
+  final double BASE_FARE = 3.50;
+  final double PER_MILE_RATE = 0.50;
   private final CarDao carDao = new CarDao();
   public void orderManager(Order order){
     String startCity = order.getStartCity();
@@ -130,7 +131,7 @@ public class OrderDao {
     return cars;
   }
 
-  private void updateOrderStatus(int orderId, String newStatus) {
+  public void updateOrderStatus(int orderId, String newStatus) {
     String procedureCall = "{CALL update_order_status(?,?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
@@ -342,7 +343,47 @@ public class OrderDao {
 
     return orders;
   }
+  public void updateOrderfare(int orderId){
+    String procedureCall = "{CALL update_order_fare(?,?,?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+      stmt.setInt(1, orderId);
+      stmt.setDouble(2, BASE_FARE);
+      stmt.setDouble(3,PER_MILE_RATE);
+      stmt.execute();
+      System.out.println("Order completed!");
+    } catch (SQLException e) {
+      if ("45000".equals(e.getSQLState())){
+        System.out.println("Invalid order id. Please retry it");
+        return;
+      }
+      e.printStackTrace();
+    }
 
+  }
+  //Driver order operations
+  public List<Order> getOrdersByStatus(String driverLicense, String orderStatus){
+    List<Order> orders = new ArrayList<>();
+    String procedureCall = "{CALL get_orders_by_driver(?,?)}";
+    try (Connection conn = DBConnector.getConnection();
+         CallableStatement stmt = conn.prepareCall(procedureCall)) {
+
+      stmt.setString(1, driverLicense);
+      stmt.setString(2,orderStatus);
+
+      try (ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+          Order order = mapRowToOrder(rs);
+          orders.add(order);
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      // Handle or log the error appropriately
+    }
+
+    return orders;
+  }
   public void deleteOrder(int orderId) {
     String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
 
