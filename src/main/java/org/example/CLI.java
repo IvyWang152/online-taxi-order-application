@@ -79,7 +79,7 @@ public class CLI {
       if(!isAuthenticatedDriver) {
         System.out.println("1. register");
         System.out.println("2. log in");
-        System.out.println("11. exit");
+        System.out.println("0. exit");
       } else{
         System.out.println("3. view profile");
         System.out.println("4. update profile");
@@ -88,7 +88,9 @@ public class CLI {
         System.out.println("7. add car");
         System.out.println("8. view car");
         System.out.println("9. view car models");
-        System.out.println("10. log out");
+        System.out.println("10. view orders");
+        System.out.println("11. complete order");
+        System.out.println("12. log out");
       }
 
       try {
@@ -104,8 +106,10 @@ public class CLI {
           case "7", "add car" -> addNewCar();
           case "8", "view car" -> showCar();
           case "9", "view car models" -> showCarModels();
-          case "10", "log out" -> logoutDriver();
-          case "11", "exit" -> exit = closingPrompt();
+          case "10", "view orders" -> viewOrdersByStatus();
+          case "11","complete order" -> completeOrder();
+          case "12","log out" -> logoutDriver();
+          case "0", "exit" -> exit = closingPrompt();
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
 
@@ -622,6 +626,50 @@ public class CLI {
       }
     }
   }
+
+  public void viewOrdersByStatus() {
+    if (!isAuthenticatedDriver || currentDriver == null) {
+      System.out.println("Please register or log in first");
+      return;
+    }
+
+    System.out.println("Please enter order status: (in progress, completed)");
+    String orderStatus = scanner.nextLine().trim().toLowerCase();
+    if (!orderStatus.equalsIgnoreCase("in progress")
+        && !orderStatus.equalsIgnoreCase("completed")){
+      System.out.println("Invalid order status. Please retry it");
+      return;
+    }
+    List<Order> orders = orderDao.getOrdersByStatus(currentDriver.getDriverLicense(), orderStatus);
+    if (orders.isEmpty()) {
+      System.out.println("No orders found for this driver.");
+    } else {
+      for (Order order : orders) {
+        System.out.println(order.toString());
+      }
+    }
+  }
+
+  public void completeOrder(){
+    if (!isAuthenticatedDriver || currentDriver == null) {
+      System.out.println("Please register or log in first");
+      return;
+    }
+    System.out.println("Please enter order id: ");
+    String orderStatus = scanner.nextLine().trim();
+    int id;
+      try {
+        id = Integer.parseInt(orderStatus);
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter an integer.");
+        return;
+      }
+    orderDao.updateOrderStatus(id, "completed");
+      orderDao.updateOrderfare(id);
+
+  }
+
+
 
   public void showRoutes(){
     if (!isAuthenticatedPassenger || currentPassenger == null) {

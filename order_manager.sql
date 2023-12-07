@@ -239,6 +239,39 @@ END $$
 DELIMITER ;
 
 
+DELIMITER $$
+
+CREATE PROCEDURE update_order_fare(order_id_p INT, base_fare_p DECIMAL(10, 2), per_mile_rate_p DECIMAL(10, 2))
+BEGIN
+    DECLARE distance_p DECIMAL(10, 2);
+    DECLARE start_city_p VARCHAR(255);
+    DECLARE end_city_p VARCHAR(255);
+    DECLARE total_fare DECIMAL(10, 2);
+    DECLARE order_exists INT;
+    
+
+    -- Fetch start and end city for the order
+    SELECT start_city, end_city INTO start_city_p, end_city_p FROM ride_order WHERE id = order_id_p;
+	SELECT COUNT(*) INTO order_exists from ride_order where id = order_id_p;
+    IF order_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Order ID not found in database.';
+    END IF;
+    -- Get the distance for the route
+    SELECT distance INTO distance_p FROM commute_distance WHERE start_city = start_city_p AND end_city = end_city_p;
+
+    -- Calculate total fare using the function
+    SET total_fare = calculate_total_fare(base_fare_p, per_mile_rate_p, distance_p);
+
+    -- Update the fare in the order
+    UPDATE ride_order
+    SET fare = total_fare
+    WHERE id = order_id_p;
+END $$
+
+DELIMITER ;
+
+
+
 
 
 
