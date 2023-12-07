@@ -123,10 +123,10 @@ DELIMITER ;
 
 -- 4. READ: read orders of a driver
 DELIMITER $$
-CREATE PROCEDURE get_order_by_driver(driver_license_p varchar(20), order_status_p ENUM('completed', 'canceled', 'in progress'))
+CREATE PROCEDURE get_orders_by_driver(driver_license_p varchar(20), order_status_p ENUM('completed', 'canceled', 'in progress'))
 BEGIN
 	SELECT * FROM ride_order o 
-    JOIN car c ON o.car = c.plate
+    JOIN car c ON o.car_plate = c.plate
     JOIN driver d ON d.driver_license = c.driver_license
     WHERE d.driver_license = driver_license_p AND o.order_status = order_status_p;	
 END $$
