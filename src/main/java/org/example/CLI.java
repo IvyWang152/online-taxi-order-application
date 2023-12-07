@@ -120,12 +120,14 @@ public class CLI {
     boolean exit = false;
 
     while (!exit) {
-      System.out.println("***** Welcome to Passenger Dashboard! *****");
       if(!isAuthenticatedPassenger) {
+        System.out.println("***** Welcome to Passenger Dashboard! *****");
         System.out.println("1. Register");
         System.out.println("2. log in");
         System.out.println("3. Exit");
       } else{
+        System.out.println("***** Hi " + currentPassenger.getName() + "! *****");
+        System.out.println("What do you want to do today?");
         System.out.println("4. View profile");
         System.out.println("5. Update profile");
         System.out.println("6. Delete account");
@@ -135,7 +137,6 @@ public class CLI {
         System.out.println("10. log out");
         System.out.println("11. view routes");
         System.out.println("12. Update orders");
-        System.out.println("13. Delete orders");
       }
       try {
         System.out.print("Enter command number: ");
@@ -152,8 +153,7 @@ public class CLI {
           case "10", "log out" -> logoutPassenger();
           case "3", "exit" -> exit = closingPrompt();
           case "11","view routes"-> showRoutes();
-          case "12", "update orders" -> updateOrder(); // New option to update orders
-          case "13", "delete order" -> deleteOrder();
+          case "12", "update orders" -> updateOrder();
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
       } catch (InputMismatchException e) {

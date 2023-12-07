@@ -60,7 +60,7 @@ DELIMITER //
 DELIMITER //
 -- UPDATE: update user profile
 CREATE PROCEDURE update_user_profile(
-    IN account_number VARCHAR(20),
+    IN account_number_P VARCHAR(20),
     IN new_name VARCHAR(50),
     IN new_gender VARCHAR(10),
     IN new_birth_date DATE
@@ -72,7 +72,7 @@ BEGIN
         gender = new_gender,
         birth_date = new_birth_date
     WHERE
-        account_number = account_number;
+        account_number = account_number_P;
 END //
 
 DELIMITER ;

@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
 import org.example.DBConnector;
 import org.example.model.Car;
 import org.example.model.CommuteDistance;
@@ -14,35 +16,84 @@ import org.example.model.Order;
 
 public class OrderDao {
 
-  private CarDao carDao = new CarDao();
+  private final CarDao carDao = new CarDao();
   public void orderManager(Order order){
     String startCity = order.getStartCity();
-    List<Car> availableCars = showAvailableCars(startCity); //1st level checking
-    if (availableCars.size()==0){
-      System.out.println(String.format("No available cars in %s",order.getStartCity()));
-      // to do: add delete order function here
+    List<Car> availableCars = showAvailableCars(startCity);
+    if (availableCars.isEmpty()){
+      System.out.printf("No available cars in %s%n",startCity);
       deleteOrder(order.getId());
       System.out.println("Sorry, the order is canceled.");
       return;
     }
-    //2nd level checking
     List<Car> matchedCars = showMatchedCars(startCity,order.getDesiredCapacity(),
         order.getAccessibility());
-    if (matchedCars.size()==0){
+    if (matchedCars.isEmpty()) {
       System.out.println("No matched cars for desired capacity or accessibility.");
-      System.out.println(String.format("Please view available cars in %s",startCity));
+      boolean continueUpdate = true;
+      while (continueUpdate) {
+        System.out.printf("1. Please view available cars in %s%n", startCity);
+        System.out.println("2. Update capacity and accessibility");
+        System.out.println("3. Delete order");
 
-      //call updateOrderCapacityAndAccessibility
-      //combine the update methods we have in this file (update capacity, accessibility)
-      //if the updated order is still not matched, break (or you want to give them second chance)
-      //give prompts to passenger: 1.update capacity and accessibility 2. delete order
+        int userChoice = getUserInput();
+
+        switch (userChoice) {
+          case 1 -> {
+            if (!availableCars.isEmpty()) {
+              System.out.println("Available cars in " + startCity + ":");
+              for (Car car : availableCars) {
+                System.out.println(car);
+              }
+            } else {
+              System.out.printf("No available cars in %s%n", startCity);
+            }
+          }
+          case 2 -> {
+            int newCapacity = getNewCapacity();
+            boolean newAccessibility = getNewAccessibility();
+            updateOrderCapacity(order.getId(), newCapacity);
+            updateOrderAccessibility(order.getId(), newAccessibility);
+            // Retry matching with the updated order
+            matchedCars = showMatchedCars(startCity, newCapacity, newAccessibility);
+            if (!matchedCars.isEmpty()) {
+              Car updatedCar = matchedCars.get(0);
+              processOrderWithMatchedCar(order.getId(), updatedCar.getPlate(), startCity);
+              continueUpdate = false;
+            }
+          }
+          case 3 -> {
+            deleteOrder(order.getId());
+            System.out.println("Order deleted. Sorry, the order is canceled.");
+            continueUpdate = false;
+          }
+          default -> System.out.println("Invalid choice. Please choose a valid option.");
+        }
+      }
     } else {
       Car curr = matchedCars.get(0);
-      processOrderWithMatchedCar(order.getId(), curr.getPlate(),startCity);
+      processOrderWithMatchedCar(order.getId(), curr.getPlate(), startCity);
     }
 
-
   }
+  private int getUserInput() {
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Enter your choice: ");
+    return scanner.nextInt();
+  }
+
+  private int getNewCapacity() {
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Enter the new capacity: ");
+    return scanner.nextInt();
+  }
+
+  private boolean getNewAccessibility() {
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Enter the new accessibility (true/false): ");
+    return scanner.nextBoolean();
+  }
+
   public void processOrderWithMatchedCar(int orderId, String carPlate,String startCity){
     String procedureCall = "{CALL process_order(?,?,?)}";
     try (Connection conn = DBConnector.getConnection();
@@ -53,7 +104,6 @@ public class OrderDao {
       stmt.execute();
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     updateOrderStatus(orderId,"in progress");
     System.out.println("Order is in progress!");
@@ -129,7 +179,6 @@ public class OrderDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     return res;
   }
@@ -141,26 +190,6 @@ public class OrderDao {
     cd.setEndCity(rs.getString("end_city"));
     cd.setDistance(rs.getDouble("distance"));
     return cd;
-  }
-
-  public Order getOrderById(int orderId) {
-    Order order = null;
-    String query = "SELECT * FROM ride_order WHERE id = ?";
-    try (Connection conn = DBConnector.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-      pstmt.setInt(1, orderId);
-      try (ResultSet rs = pstmt.executeQuery()) {
-        if (rs.next()) {
-          order = mapRowToOrder(rs);
-        }
-      }
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-      // Handle or log the error appropriately
-    }
-    return order;
   }
 
   private Order mapRowToOrder(ResultSet rs) throws SQLException {
@@ -191,7 +220,6 @@ public class OrderDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
   }
 
@@ -206,7 +234,6 @@ public class OrderDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
   }
 
@@ -222,7 +249,6 @@ public class OrderDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
   }
 
@@ -239,7 +265,6 @@ public class OrderDao {
       stmt.setString(6, order.getEndCity());
 
       stmt.execute();
-      //System.out.println("Order created successfully!");
       order.setId(getLatestOrderId(order.getAccountNumber()));
       orderManager(order);
 
@@ -276,7 +301,26 @@ public class OrderDao {
     return latestOrderId;
   }
 
+  public Order getOrderById(int orderId) {
+    Order order = null;
+    String query = "SELECT * FROM ride_order WHERE id = ?";
 
+    try (Connection conn = DBConnector.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+      pstmt.setInt(1, orderId);
+
+      try (ResultSet rs = pstmt.executeQuery()) {
+        if (rs.next()) {
+          order = mapRowToOrder(rs);
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return order;
+  }
   public List<Order> getOrdersForPassenger(String accountNumber) {
     List<Order> orders = new ArrayList<>();
     String procedureCall = "{CALL get_orders_for_passenger(?)}";
@@ -294,7 +338,6 @@ public class OrderDao {
       }
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
 
     return orders;
@@ -311,7 +354,6 @@ public class OrderDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
       throw new RuntimeException("Error deleting order: " + e.getMessage());
     }
   }
