@@ -17,27 +17,33 @@ public class OrderDao {
   private CarDao carDao = new CarDao();
   public void orderManager(Order order){
     String startCity = order.getStartCity();
-    List<Car> availableCars = showAvailableCars(startCity);
+    List<Car> availableCars = showAvailableCars(startCity); //1st level checking
     if (availableCars.size()==0){
       System.out.println(String.format("No available cars in %s",order.getStartCity()));
       // to do: add delete order function here
+      deleteOrder(order.getId());
       System.out.println("Sorry, the order is canceled.");
       return;
     }
+    //2nd level checking
     List<Car> matchedCars = showMatchedCars(startCity,order.getDesiredCapacity(),
         order.getAccessibility());
     if (matchedCars.size()==0){
       System.out.println("No matched cars for desired capacity or accessibility.");
       System.out.println(String.format("Please view available cars in %s",startCity));
-      //add delete or update logic here
+
+      //call updateOrderCapacityAndAccessibility
+      //combine the update methods we have in this file (update capacity, accessibility)
+      //if the updated order is still not matched, break (or you want to give them second chance)
+      //give prompts to passenger: 1.update capacity and accessibility 2. delete order
     } else {
       Car curr = matchedCars.get(0);
-      processOrderWithMatchedCar(order.getId(), curr.getPlate(), order.getStartCity());
+      processOrderWithMatchedCar(order.getId(), curr.getPlate(),startCity);
     }
 
 
   }
-  public void processOrderWithMatchedCar(int orderId, String carPlate, String startCity){
+  public void processOrderWithMatchedCar(int orderId, String carPlate,String startCity){
     String procedureCall = "{CALL process_order(?,?,?)}";
     try (Connection conn = DBConnector.getConnection();
          CallableStatement stmt = conn.prepareCall(procedureCall)) {
@@ -166,7 +172,11 @@ public class OrderDao {
     order.setAccessibility(rs.getBoolean("accessibility"));
     order.setStartCity(rs.getString("start_city"));
     order.setEndCity(rs.getString("end_city"));
-    // Add other mappings as needed
+    order.setCarPlate(rs.getString("car_plate"));
+    order.setOrderStatus(rs.getString("order_status"));
+    order.setFare(rs.getDouble("fare"));
+    order.setPassengerReview(rs.getInt("passenger_review"));
+    order.setDriverReview(rs.getInt("driver_review"));
     return order;
   }
 

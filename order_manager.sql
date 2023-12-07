@@ -154,6 +154,7 @@ DELIMITER ;
 
 DELIMITER $$
 
+-- drop trigger after_order_completion;
 CREATE TRIGGER after_order_completion
 AFTER UPDATE ON ride_order
 FOR EACH ROW
@@ -161,7 +162,7 @@ BEGIN
 	IF NEW.order_status = 'in progress' AND OLD.order_status = 'available' THEN
 		UPDATE car
         SET location = NEW.start_city
-        WHERE plate = (SELECT car_plate FROM ride_order WHERE id = NEW.id);
+        WHERE plate = NEW.car_plate;
 		UPDATE driver
         INNER JOIN car ON driver.driver_license = car.driver_license
         SET is_available = FALSE WHERE car.plate = NEW.car_plate;
@@ -211,7 +212,7 @@ CREATE PROCEDURE process_order(order_id INT,car_plate_p varchar(20),start_city_p
 BEGIN
 	UPDATE ride_order
     SET car_plate = car_plate_p,
-    start_city = start_city_p
+	start_city = start_city_p
     WHERE id = order_id;
 
 END $$
