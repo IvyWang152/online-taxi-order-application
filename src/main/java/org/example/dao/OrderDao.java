@@ -63,6 +63,8 @@ public class OrderDao {
               continueUpdate = false;
             }
             else {
+              System.out.println("No car is available for the updated values!");
+              deleteOrder(order.getId());
             continueUpdate = false;
           }
           }

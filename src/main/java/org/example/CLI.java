@@ -633,7 +633,7 @@ public class CLI {
       return;
     }
 
-    System.out.println("Please enter order status: (in progress, completed)");
+    System.out.println("Please enter order status: (1: in progress, 2: completed)");
     String orderStatus = scanner.nextLine().trim().toLowerCase();
     if (!orderStatus.equalsIgnoreCase("in progress")
         && !orderStatus.equalsIgnoreCase("completed")){
