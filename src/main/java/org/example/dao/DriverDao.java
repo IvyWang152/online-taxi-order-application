@@ -13,7 +13,7 @@ import org.example.model.Driver;
 //addDriver, getDriver, getAllDrivers, updateDriver, and deleteDriver are straightforward methods
 // that execute SQL commands or stored procedures using JDBC.
 //mapRowToDriver is a utility method to convert a ResultSet row into a Driver object.
-// This is helpful to avoid duplicating this code in methods that read drivers from the database
+
 public class DriverDao {
 
   public void addDriver(Driver driver) {
@@ -36,7 +36,6 @@ public class DriverDao {
             + "' is already used by an existing member.");
       } else {
         e.printStackTrace();
-        // Handle or log the error appropriately
       }
     }
   }
@@ -55,7 +54,6 @@ public class DriverDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     return null;
   }
@@ -75,7 +73,6 @@ public class DriverDao {
       return getDriver(driver.getDriverLicense());
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     return null;
   }
@@ -106,7 +103,6 @@ public class DriverDao {
       return res;
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     return null;
   }
