@@ -140,7 +140,7 @@ public class CLI {
         System.out.println("9. Create an order (Please check the available routes first (11. view routes)");
         System.out.println("10. log out");
         System.out.println("11. view routes");
-        System.out.println("12. Update orders");
+        //System.out.println("12. Update orders");
       }
       try {
         System.out.print("Enter command number: ");
@@ -157,7 +157,7 @@ public class CLI {
           case "10", "log out" -> logoutPassenger();
           case "3", "exit" -> exit = closingPrompt();
           case "11","view routes"-> showRoutes();
-          case "12", "update orders" -> updateOrder();
+          //case "12", "update orders" -> updateOrder();
           default -> System.out.println("Invalid choice. Please enter a valid value.");
         }
       } catch (InputMismatchException e) {
@@ -355,6 +355,7 @@ public class CLI {
       System.out.println("Please register or login first");
       return;
     }
+    currentDriver = driverDao.getDriver(currentDriver.getDriverLicense());
     System.out.println(currentDriver);
   }
 
