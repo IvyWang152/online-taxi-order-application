@@ -24,13 +24,11 @@ To run the Taxi Booking Application, follow these steps:
 1. Ensure Java is installed on your system.
 2. Clone the repository to your local machine.
 3. Navigate to the project directory and compile the Java files.
-4. Run `Main.java` to start the application.
+4. Run `cityride_dump.sql` in mysql.
+5. Run `Main.java` to start the application.
 
 ## Usage
 After starting the application, follow the on-screen prompts to interact with the system. You can choose to operate as a driver or a passenger, and then perform various actions based on your role.
 
 ## Contributing
 Contributions to the Taxi Booking Application are welcome. Please fork the repository and submit a pull request with your proposed changes.
-
-## License
-This project is licensed under the [MIT License](LICENSE.md).
