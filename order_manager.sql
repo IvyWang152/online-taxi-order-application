@@ -58,7 +58,7 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE update_order_accessibility(
 	order_id int,
-    accessibility_p int
+    accessibility_p BOOL
 )
 BEGIN 
     DECLARE order_exists INT;
