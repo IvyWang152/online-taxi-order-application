@@ -30,7 +30,7 @@ public class CarDao {
         // Handle duplicate entry
         System.out.println("Error: The specified car model does not exist. Please view existing models");
      } else {
-      e.printStackTrace(); // Handle other SQL exceptions
+      e.printStackTrace();
     }
     }
 
@@ -45,7 +45,7 @@ public class CarDao {
       stmt.setString(2, make);
       stmt.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace(); // Handle exception
+      e.printStackTrace();
     }
   }
 
@@ -60,7 +60,7 @@ public class CarDao {
         models.add(new CarModel(rs.getInt("car_model_id"), rs.getString("model"), rs.getString("make")));
       }
     } catch (SQLException e) {
-      e.printStackTrace(); // Handle exception
+      e.printStackTrace();
     }
     return models;
   }
@@ -86,7 +86,7 @@ public class CarDao {
         // Handle the custom error message
         System.out.println("No car registered under this driver account.");
       } else {
-        e.printStackTrace(); // Handle other SQL exceptions
+        e.printStackTrace();
       }
     }
     return cars;
@@ -106,7 +106,7 @@ public class CarDao {
         }
       }
     } catch (SQLException e) {
-        e.printStackTrace(); // Handle other SQL exceptions
+        e.printStackTrace();
     }
     return cars;
 

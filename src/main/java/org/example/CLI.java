@@ -617,7 +617,6 @@ public class CLI {
       return;
     }
 
-    //List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     List<Order> orders = orderDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     if (orders.isEmpty()) {
       System.out.println("No orders found for this passenger.");
@@ -747,7 +746,6 @@ public class CLI {
     } while (!accessibilityInput.equalsIgnoreCase("true") && !accessibilityInput.equalsIgnoreCase("false"));
 
     Order newOrder = new Order(orderDate, desiredCapacity, accessibility, startCity, endCity, accountNumber);
-    //passengerDao.createOrder(newOrder);
     orderDao.createOrder(newOrder);
   }
   public void updateOrder() {
@@ -761,7 +759,6 @@ public class CLI {
     }
 
     // Display passenger's orders
-    //List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     List<Order> orders = orderDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     if (orders.isEmpty()) {
       System.out.println("No orders found for this passenger.");
@@ -859,7 +856,6 @@ public class CLI {
     }
 
     // Display passenger's orders
-    //List<Order> orders = passengerDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     List<Order> orders = orderDao.getOrdersForPassenger(currentPassenger.getAccountNumber());
     if (orders.isEmpty()) {
       System.out.println("No orders found for this passenger.");
@@ -893,7 +889,6 @@ public class CLI {
     String confirmation = scanner.nextLine().trim().toLowerCase();
     if (confirmation.equals("yes")) {
       // Delete the order
-      //passengerDao.deleteOrder(orderId);
       orderDao.deleteOrder(orderId);
       System.out.println("Order deleted successfully.");
     } else {
