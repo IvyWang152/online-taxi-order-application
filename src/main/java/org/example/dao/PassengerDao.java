@@ -26,7 +26,6 @@ public class PassengerDao {
       stmt.execute();
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
   }
 
@@ -44,7 +43,6 @@ public class PassengerDao {
 
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     return null;
   }
@@ -61,7 +59,6 @@ public class PassengerDao {
       return getPassenger(passenger.getAccountNumber());
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
     return null;
   }

@@ -86,7 +86,7 @@ public class CLI {
         System.out.println("5. delete account");
         System.out.println("6. view all drivers");
         System.out.println("7. add car");
-        System.out.println("8. view car");
+        System.out.println("8. view your cars");
         System.out.println("9. view car models");
         System.out.println("10. view orders");
         System.out.println("11. complete order");
@@ -459,7 +459,7 @@ public class CLI {
     }
 
     currentPassenger = passengerDao.updatePassenger(new Passenger(accountNumber,name,gender,birthDate));
-    System.out.println("Update driver profile successfully!");
+    System.out.println("Update passenger profile successfully!");
     System.out.println(currentPassenger.toString());
   }
 
@@ -893,7 +893,6 @@ public class CLI {
       System.out.println("Deletion canceled.");
     }
   }
-
 
 
 }

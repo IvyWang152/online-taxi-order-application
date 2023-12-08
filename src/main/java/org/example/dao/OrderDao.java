@@ -62,6 +62,9 @@ public class OrderDao {
               processOrderWithMatchedCar(order.getId(), updatedCar.getPlate(), startCity);
               continueUpdate = false;
             }
+            else {
+            continueUpdate = false;
+          }
           }
           case 3 -> {
             deleteOrder(order.getId());
@@ -211,12 +214,13 @@ public class OrderDao {
   }
 
   public void updateOrderCapacity(int orderId, int newCapacity) {
-    String query = "UPDATE ride_order SET desired_capacity = ? WHERE id = ?";
+//    String query = "UPDATE ride_order SET desired_capacity = ? WHERE id = ?";
+    String query = "{CALL update_order_capacity(?,?)}";
     try (Connection conn = DBConnector.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-      pstmt.setInt(1, newCapacity);
-      pstmt.setInt(2, orderId);
+      pstmt.setInt(1, orderId);
+      pstmt.setInt(2, newCapacity);
       pstmt.executeUpdate();
 
     } catch (SQLException e) {
@@ -225,12 +229,13 @@ public class OrderDao {
   }
 
   public void updateOrderAccessibility(int orderId, boolean newAccessibility) {
-    String query = "UPDATE ride_order SET accessibility = ? WHERE id = ?";
+//    String query = "UPDATE ride_order SET accessibility = ? WHERE id = ?";
+    String query = "{ CALL update_order_accessibility(?,?)}";
     try (Connection conn = DBConnector.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-      pstmt.setBoolean(1, newAccessibility);
-      pstmt.setInt(2, orderId);
+      pstmt.setInt(1, orderId);
+      pstmt.setBoolean(2, newAccessibility);
       pstmt.executeUpdate();
 
     } catch (SQLException e) {
@@ -239,13 +244,13 @@ public class OrderDao {
   }
 
   public void updateOrderRoute(int orderId, String newStartCity, String newEndCity) {
-    String query = "UPDATE ride_order SET start_city = ?, end_city = ? WHERE id = ?";
+//    String query = "UPDATE ride_order SET start_city = ?, end_city = ? WHERE id = ?";
+    String query = "{CALL update_order_route(?,?,?)}";
     try (Connection conn = DBConnector.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-      pstmt.setString(1, newStartCity);
-      pstmt.setString(2, newEndCity);
-      pstmt.setInt(3, orderId);
+      pstmt.setInt(1, orderId);
+      pstmt.setString(2, newStartCity);
+      pstmt.setString(3, newEndCity);
       pstmt.executeUpdate();
 
     } catch (SQLException e) {
@@ -302,26 +307,26 @@ public class OrderDao {
     return latestOrderId;
   }
 
-  public Order getOrderById(int orderId) {
-    Order order = null;
-    String query = "SELECT * FROM ride_order WHERE id = ?";
-
-    try (Connection conn = DBConnector.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-      pstmt.setInt(1, orderId);
-
-      try (ResultSet rs = pstmt.executeQuery()) {
-        if (rs.next()) {
-          order = mapRowToOrder(rs);
-        }
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return order;
-  }
+//  public Order getOrderById(int orderId) {
+//    Order order = null;
+//    String query = "SELECT * FROM ride_order WHERE id = ?";
+//
+//    try (Connection conn = DBConnector.getConnection();
+//         PreparedStatement pstmt = conn.prepareStatement(query)) {
+//
+//      pstmt.setInt(1, orderId);
+//
+//      try (ResultSet rs = pstmt.executeQuery()) {
+//        if (rs.next()) {
+//          order = mapRowToOrder(rs);
+//        }
+//      }
+//    } catch (SQLException e) {
+//      e.printStackTrace();
+//    }
+//
+//    return order;
+//  }
   public List<Order> getOrdersForPassenger(String accountNumber) {
     List<Order> orders = new ArrayList<>();
     String procedureCall = "{CALL get_orders_for_passenger(?)}";
@@ -379,13 +384,13 @@ public class OrderDao {
       }
     } catch (SQLException e) {
       e.printStackTrace();
-      // Handle or log the error appropriately
     }
 
     return orders;
   }
   public void deleteOrder(int orderId) {
-    String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
+//    String deleteOrderQuery = "DELETE FROM ride_order WHERE id = ?";
+    String deleteOrderQuery = "{CALL delete_order(?)}";
 
     try (Connection conn = DBConnector.getConnection();
          PreparedStatement stmt = conn.prepareStatement(deleteOrderQuery)) {

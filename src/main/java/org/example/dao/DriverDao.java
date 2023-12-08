@@ -111,12 +111,6 @@ public class DriverDao {
     return null;
   }
 
-
-
-
-
-
-
   private Driver mapRowToDriver(ResultSet rs) throws SQLException {
     Driver driver = new Driver();
     driver.setDriverLicense(rs.getString("driver_license"));
